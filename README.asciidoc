@@ -1,11 +1,13 @@
 This is the documentation file for team TWELVE.
 Team members and their main roles are:
+
 	Pille Pärnalaas - Programming
 	Kenno Kallastu - Mechanics
 	Stepan Denysenko - Electronics
 
 
 DAILY BLOG
+
 ---------------------------------------------------------
 14.09
 
