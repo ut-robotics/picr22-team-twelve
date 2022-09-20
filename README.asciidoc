@@ -12,11 +12,21 @@ DAILY BLOG
 14.09
 
 First gathering of the team. Divided main roles and started work.
-Kenno - ....
+Kenno - Omnidirectional wheels attached to the chassis along with the motors. Helped with electronics. Getting familiar with the lab.(1.5hrs)
 Stepan - ....
 Pille - Took home the NUC for initial setup.
 ---------------------------------------------------------
 
+---------------------------------------------------------
+
+---------------------------------------------------------
+
+---------------------------------------------------------
+15.09 
+
+---------------------------------------------------------
+
+Kenno - Reading the guides. Rough planning of the design process, was pretty overwhelmed and didn't understand what was supposed to be done. (1hr)
 ---------------------------------------------------------
 17.09
 
