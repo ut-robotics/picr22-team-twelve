@@ -15,12 +15,14 @@ First gathering of the team. Divided main roles and started work.
 Kenno - ....
 Stepan - ....
 Pille - Took home the NUC for initial setup.
+---------------------------------------------------------
 
 ---------------------------------------------------------
 17.09
 
 Pille - Made an Ubuntu image for the computer. Installed Ubuntu, configured setup.
 	Got some errors when installing the segment module. (1,5 hours)
+---------------------------------------------------------
 
 ---------------------------------------------------------
 18.09
@@ -29,13 +31,16 @@ Pille - Got the bootcamp example code running. Tried to write commands for sendi
 	Need to test out with hardware.
 	Tried to upload daily blog to git, encountered problems.
 	(2 hours)
+---------------------------------------------------------
 
 ---------------------------------------------------------
 19.09
 
 Project progress presentations
+---------------------------------------------------------
 
 ---------------------------------------------------------
 20.09
 
 Pille - working on the git repo issues. Connecting over ssh. (1h)
+---------------------------------------------------------
