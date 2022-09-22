@@ -55,5 +55,5 @@ Pille - working on the git repo issues. Connecting over ssh. (1h)
 ---------------------------------------------------------
 22.09
 
-Kenno - Thrower measurements for CAD. Swapped the M3 bolts on the electric motor mount to shorter ones.
+Kenno - Thrower measurements for CAD. Swapped the M3 bolts on the electric motor mount to shorter ones. (1h10min)
 ---------------------------------------------------------
