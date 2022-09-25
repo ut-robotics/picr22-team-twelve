@@ -56,4 +56,6 @@ Pille - working on the git repo issues. Connecting over ssh. (1h)
 22.09
 
 Kenno - Thrower measurements for CAD. Swapped the M3 bolts on the electric motor mount to shorter ones. (1h10min)
+Pille - Programming. Got the serial connection working. Needs some additional code to connect even if the port changes. (2h)
+Stepan - 
 ---------------------------------------------------------
