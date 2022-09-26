@@ -26,8 +26,17 @@ def main_loop():
 
     # incase permission issues: sudo chmod 666 /dev/tty0
     # idProduct=5740 to filter the list given by  serial.tools.list_ports.comports(include_links=False)
-    # from there get the correct
+    # serial connection port
     port = '/dev/ttyACM0'
+    # get all the available seiral ports
+    ports = serial.tools.list_ports.comports()
+    for p in ports:
+        print(p.device)
+        print(p.hwid)
+        if p.hwid.__contains__("5740"):
+            port=p.device
+            print("Serial port m22ratud")
+
     omni_motion.open(port)
 
     start = time.time()
@@ -71,6 +80,8 @@ def main_loop():
             elif current_time > 2:
                 print("sent2")
                 omni_motion.send_commands(-20, 0, 0, 0)
+            elif 6 > current_time > 4:
+                omni_motion.send_commands(0, 0, 0, 0)
 
     except KeyboardInterrupt:
         print("closing....")
