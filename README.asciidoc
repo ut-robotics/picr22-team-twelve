@@ -13,7 +13,7 @@ DAILY BLOG
 
 First gathering of the team. Divided main roles and started work.
 Kenno - Omnidirectional wheels attached to the chassis along with the motors. Helped with electronics. Getting familiar with the lab.(1.5hrs)
-Stepan - ....
+Stepan - Wired, soldered.
 Pille - Took home the NUC for initial setup.
 ---------------------------------------------------------
 
@@ -57,5 +57,15 @@ Pille - working on the git repo issues. Connecting over ssh. (1h)
 
 Kenno - Thrower measurements for CAD. Swapped the M3 bolts on the electric motor mount to shorter ones. (1h10min)
 Pille - Programming. Got the serial connection working. Needs some additional code to connect even if the port changes. (2h)
-Stepan - 
+Stepan - Fixed faulty wireing.
+---------------------------------------------------------
+
+---------------------------------------------------------
+26.09
+
+Pille - Fixed github commit issues I had to upload bootcamp code to the git folder. Connected the mainboard wires to the motors. Works!
+Tested serial connection over HTerm and with the bootcamp code task. Works! (1.5h)
+Next in line: 
+1) sorting the serial ports so that the robot will always connect to the right port even if the name changes.
+2) using the camera and detecting the ball.
 ---------------------------------------------------------
