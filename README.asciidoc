@@ -86,4 +86,5 @@ Pille - Fixed github commit issues I had to upload bootcamp code to the git fold
 
 Pille - Edited the blog with spent time, read the battery instructions.
 	Team management. (1h)
+Kenno - Imported test robot files into Fusion 360, started with the thrower design, watched tutorials. (2h)
 ---------------------------------------------------------
