@@ -9,26 +9,34 @@ Team members and their main roles are:
 DAILY BLOG
 
 ---------------------------------------------------------
+03.09
+BOOTCAMP DAY ONE
+Kenno, Pille - present and working the tasks (both 8h)
+---------------------------------------------------------
+
+---------------------------------------------------------
 14.09
 
 First gathering of the team. Divided main roles and started work.
-Kenno - Omnidirectional wheels attached to the chassis along with the motors. Helped with electronics. Getting familiar with the lab.(1.5hrs)
-Stepan - Wired, soldered.
-Pille - Took home the NUC for initial setup.
+Kenno - Omnidirectional wheels attached to the chassis along with the motors. Helped with electronics. 
+	Getting familiar with the lab.(1.5hrs)
+Stepan - Wired, soldered. (1.5h)
+Pille - Took home the NUC for initial setup. (1h)
 ---------------------------------------------------------
 
 
 ---------------------------------------------------------
 15.09 
 
-Kenno - Reading the guides. Rough planning of the design process, was pretty overwhelmed and didn't understand what was supposed to be done. (1hr)
+Kenno - Reading the guides. Rough planning of the design process, was pretty overwhelmed and didn't 
+	understand what was supposed to be done. (1hr)
 ---------------------------------------------------------
 
 ---------------------------------------------------------
 17.09
 
 Pille - Made an Ubuntu image for the computer. Installed Ubuntu, configured setup.
-	Got some errors when installing the segment module. (1,5 hours)
+	Got some errors when installing the segment module. (1.5hrs)
 ---------------------------------------------------------
 
 ---------------------------------------------------------
@@ -37,13 +45,14 @@ Pille - Made an Ubuntu image for the computer. Installed Ubuntu, configured setu
 Pille - Got the bootcamp example code running. Tried to write commands for sending over serial.
 	Need to test out with hardware.
 	Tried to upload daily blog to git, encountered problems.
-	(2 hours)
+	(2hrs)
 ---------------------------------------------------------
 
 ---------------------------------------------------------
 19.09
 
-Project progress presentations
+Pille - project progress presentation + slides (2hrs)
+Kenno, Stepan - Project progress presentations (1.5hrs)
 ---------------------------------------------------------
 
 ---------------------------------------------------------
@@ -55,17 +64,26 @@ Pille - working on the git repo issues. Connecting over ssh. (1h)
 ---------------------------------------------------------
 22.09
 
-Kenno - Thrower measurements for CAD. Swapped the M3 bolts on the electric motor mount to shorter ones. (1h10min)
-Pille - Programming. Got the serial connection working. Needs some additional code to connect even if the port changes. (2h)
-Stepan - Fixed faulty wireing.
+Kenno - Thrower measurements for CAD. Swapped the M3 bolts on the electric motor mount to 
+	shorter ones. (1h10min)
+Pille - Programming. Got the serial connection working. Needs some additional code to connect even 
+	if the port changes. (2h)
+Stepan - Fixed faulty wiring. (1h)
 ---------------------------------------------------------
 
 ---------------------------------------------------------
 26.09
 
-Pille - Fixed github commit issues I had to upload bootcamp code to the git folder. Connected the mainboard wires to the motors. Works!
-Tested serial connection over HTerm and with the bootcamp code task. Works!
-Sorted the serial ports so that the robot will always connect to the right port even if the name changes. (1.5h)
-Next in line: 
-2) using the camera and detecting the ball.
+Pille - Fixed github commit issues I had to upload bootcamp code to the git folder. Connected the 
+	mainboard wires to the motors. Works!
+	Tested serial connection over HTerm and with the bootcamp code task. Works!
+	Sorted the serial ports so that the robot will always connect to the right port even if 
+	the name changes. Next taske is using the camera and detecting the ball. (1.5h)
+---------------------------------------------------------
+
+---------------------------------------------------------
+28.09
+
+Pille - Edited the blog with spent time, read the battery instructions.
+	Team management. (1h)
 ---------------------------------------------------------
