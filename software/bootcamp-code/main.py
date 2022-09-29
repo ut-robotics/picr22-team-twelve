@@ -45,6 +45,7 @@ def main_loop():
     frame_cnt = 0
     try:
         start_time = time.time()
+        sent=0
         while True:
             # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
@@ -75,10 +76,14 @@ def main_loop():
                     break
             current_time = time.time()-start_time
             if current_time < 2:
+                if sent!=1:
+                    sent=1
+                    print("sent1")
                 omni_motion.send_commands(20, 0, 0, 0)
-                print("sent1")
             elif current_time > 2:
-                print("sent2")
+                if sent!=2:
+                    sent=2
+                    print("sent2")
                 omni_motion.send_commands(-20, 0, 0, 0)
             elif 6 > current_time > 4:
                 omni_motion.send_commands(0, 0, 0, 0)
