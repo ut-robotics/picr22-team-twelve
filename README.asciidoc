@@ -88,8 +88,23 @@ Pille - Edited the blog with spent time, read the battery instructions.
 	Team management. (1h)
 Kenno - Imported test robot files into Fusion 360, started with the thrower design, watched tutorials. (2h)
 ---------------------------------------------------------
+
+---------------------------------------------------------
+29.09
+
+Pille - Got the battery briefing. Tested the robot with a battery. Found some faulty wiring. (1.5h)
+Stepan - Got the battery briefing. Tested the robot with a battery. Found out that the on/off switch is faulty 
+	and needs to be replaced. (2h)
+---------------------------------------------------------
+
 ---------------------------------------------------------
 30.09
 
 Kenno - Gathering intel from previous years, even more CAD tutorials, thrower is almost ready. (3h)
+---------------------------------------------------------
+
+---------------------------------------------------------
+01.10
+
+Pille - Progress presentation slides, blog entries. Team management. (0.5h)
 ---------------------------------------------------------
