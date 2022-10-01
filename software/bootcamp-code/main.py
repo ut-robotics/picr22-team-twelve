@@ -25,7 +25,7 @@ def main_loop():
     motion_sim2.open()
 
     # incase permission issues: sudo chmod 666 /dev/tty0
-    # idProduct=5740 to filter the list given by  serial.tools.list_ports.comports(include_links=False)
+    # idProduct=5740 to filter the list given by serial.tools.list_ports.comports(include_links=False)
     # serial connection port
     port = '/dev/ttyACM0'
     # get all the available seiral ports
@@ -35,7 +35,8 @@ def main_loop():
         print(p.hwid)
         if p.hwid.__contains__("5740"):
             port=p.device
-            print("Serial port m22ratud")
+            print("Serial port assigned")
+            break
 
     omni_motion.open(port)
 
@@ -45,7 +46,8 @@ def main_loop():
     frame_cnt = 0
     try:
         start_time = time.time()
-        sent=0
+        # unnessecary now:       	sent=0
+        
         while True:
             # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
@@ -74,19 +76,27 @@ def main_loop():
                 k = cv2.waitKey(1) & 0xff
                 if k == ord('q'):
                     break
-            current_time = time.time()-start_time
-            if current_time < 2:
+            
+            #find time passed since the start of program
+            time_passed = time.time()-start_time
+            
+            move_wheel_s(omni_motion, 0, 2, time_passed, 20)
+            move_wheel_s(omni_motion, 2, 4, time_passed, -20)
+            move_wheel_s(omni_motion, 4, 6, time_passed)
+            """
+            if time_passed < 2:
                 if sent!=1:
                     sent=1
                     print("sent1")
                 omni_motion.send_commands(20, 0, 0, 0)
-            elif current_time > 2:
+            elif 4 > time_passed > 2:
                 if sent!=2:
                     sent=2
                     print("sent2")
                 omni_motion.send_commands(-20, 0, 0, 0)
-            elif 6 > current_time > 4:
+            elif 6 > time_passed > 4:
                 omni_motion.send_commands(0, 0, 0, 0)
+             """
 
     except KeyboardInterrupt:
         print("closing....")
@@ -98,3 +108,15 @@ def main_loop():
         omni_motion.close(port)
 
 main_loop()
+
+# function to move wheel/wheels for given time
+def move_wheel_s(omnim_robot_instance, start_time, end_time, time_passed, speed1=0, speed2=0, speed3=0):
+    if time_passed<start_time:
+        return
+    elif time_passed>end_time:
+        return
+    else:
+        omnim_robot_instance.send_commands(speed1, speed2, speed3, 0)
+    
+    
+    
