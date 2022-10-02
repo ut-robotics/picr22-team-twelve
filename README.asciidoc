@@ -15,6 +15,7 @@ Kenno, Pille:: present and working the tasks (both 8h)
 
 === 14.09
 First gathering of the team. Divided main roles and started work.
+
 Kenno:: Omnidirectional wheels attached to the chassis along with the motors. Helped with electronics. 
 	Getting familiar with the lab.(1.5h)
 Stepan:: Wired, soldered. (1.5h)
