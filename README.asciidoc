@@ -10,7 +10,7 @@
 == DAILY BLOG
 
 === 03.09
-BOOTCAMP DAY ONE
+====== BOOTCAMP DAY ONE
 Kenno, Pille:: present and working the tasks (both 8h)
 
 === 14.09
