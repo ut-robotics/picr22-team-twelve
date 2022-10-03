@@ -88,6 +88,7 @@ Pille::
 Pille:: 
 	* Team management issues. (30min)
 	* Reediting the daily blog (15min)
+	
 === 03.10
 
 Kenno:: 
