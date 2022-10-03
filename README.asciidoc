@@ -88,3 +88,7 @@ Pille::
 Pille:: 
 	* Team management issues. (30min)
 	* Reediting the daily blog (15min)
+=== 03.10
+
+Kenno:: 
+	* Finished the first thrower design, slides for presentation. (1h)
