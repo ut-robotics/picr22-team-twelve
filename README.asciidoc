@@ -91,5 +91,11 @@ Pille::
 	
 === 03.10
 
-Kenno:: 
-	* Finished the first thrower design, slides for presentation. (1h)
+Kenno:: Finished the first thrower design, slides for presentation. (1h)
+
+=== 05.10
+
+Pille:: Filling in the project time planning tool, sending to other team members (30min).
+
+=== 06.10
+	
