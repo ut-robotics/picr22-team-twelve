@@ -98,6 +98,7 @@ Kenno:: Finished the first thrower design, slides for presentation. (1h)
 Pille:: 
 	* Filling in the project time planning tool, sending to other team members (30min).
 	* Cleaning up the main.py file, moving serial connection to motion class. Starting with driving logic. (30min)
+	* Working on the driving logic, need to figure out the speed calculations. (1h15min)
 
 === 06.10
 
