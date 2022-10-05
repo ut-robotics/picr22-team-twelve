@@ -3,7 +3,6 @@ import camera
 import motion
 import cv2
 import time
-import serial.tools.list_ports
 
 def main_loop():
     debug = True
@@ -15,12 +14,12 @@ def main_loop():
     
     #camera instance for normal web cameras
     #cam = camera.OpenCVCamera(id = 2)
-    # camera instance for realsense cameras
+    #camera instance for realsense cameras
     cam = camera.RealsenseCamera(exposure = 100)
-    
     processor = image_processor.ImageProcessor(cam, debug=debug)
 
-    processor.start()
+    processor.start() # ilma kaamerata hangub siin
+
     motion_sim.open()
     motion_sim2.open()
 
@@ -33,14 +32,34 @@ def main_loop():
     frame_cnt = 0
     try:
         start_time = time.time()
-        # unnessecary now:       	sent=0
-        
         while True:
             # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
 
-            # This is where you add the driving behaviour of your robot. It should be able to filter out
+            # TODO This is where you add the driving behaviour of your robot. It should be able to filter out
             # objects of interest and calculate the required motion for reaching the objects
+
+            # the biggest ball is the first one in the detected balls list
+            largest_ball_Object = processedData.balls[0]
+            # the coordinates of the largest ball, THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER
+            largest_ball_xco = largest_ball_Object.obj_x
+            largest_ball_yco = largest_ball_Object.obj_y
+            # TODO Using these coordinates calculate the side speed, forward speed and rotation for the robot
+            side_speed = largest_ball_xco
+            forward_speed = largest_ball_yco
+            rotation = 0
+
+            # Drive towards a ball
+            omni_motion.move(side_speed, forward_speed, rotation)
+
+            # find time passed since the start of program
+            time_passed = time.time() - start_time
+
+            # move one wheel in forward direction 2s, then other dirction 2s.
+            move_wheel_s(omni_motion, 0, 2, time_passed, 20)
+            move_wheel_s(omni_motion, 2, 4, time_passed, -20)
+            move_wheel_s(omni_motion, 4, 6, time_passed)
+
 
             frame_cnt +=1
 
@@ -63,27 +82,7 @@ def main_loop():
                 k = cv2.waitKey(1) & 0xff
                 if k == ord('q'):
                     break
-            
-            #find time passed since the start of program
-            time_passed = time.time()-start_time
-            
-            move_wheel_s(omni_motion, 0, 2, time_passed, 20)
-            move_wheel_s(omni_motion, 2, 4, time_passed, -20)
-            move_wheel_s(omni_motion, 4, 6, time_passed)
-            """
-            if time_passed < 2:
-                if sent!=1:
-                    sent=1
-                    print("sent1")
-                omni_motion.send_commands(20, 0, 0, 0)
-            elif 4 > time_passed > 2:
-                if sent!=2:
-                    sent=2
-                    print("sent2")
-                omni_motion.send_commands(-20, 0, 0, 0)
-            elif 6 > time_passed > 4:
-                omni_motion.send_commands(0, 0, 0, 0)
-             """
+
 
     except KeyboardInterrupt:
         print("closing....")
@@ -104,6 +103,5 @@ def move_wheel_s(omnim_robot_instance, start_time, end_time, time_passed, speed1
         return
     else:
         omnim_robot_instance.send_commands(speed1, speed2, speed3, 0)
-    
     
     
