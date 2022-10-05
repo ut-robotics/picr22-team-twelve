@@ -24,21 +24,8 @@ def main_loop():
     motion_sim.open()
     motion_sim2.open()
 
-    # incase permission issues: sudo chmod 666 /dev/tty0
-    # idProduct=5740 to filter the list given by serial.tools.list_ports.comports(include_links=False)
-    # serial connection port
-    port = '/dev/ttyACM0'
-    # get all the available seiral ports
-    ports = serial.tools.list_ports.comports()
-    for p in ports:
-        print(p.device)
-        print(p.hwid)
-        if p.hwid.__contains__("5740"):
-            port=p.device
-            print("Serial port assigned")
-            break
-
-    omni_motion.open(port)
+    # open the serial connection
+    omni_motion.open()
 
     start = time.time()
     fps = 0
@@ -105,7 +92,7 @@ def main_loop():
         processor.stop()
         motion_sim.close()
         motion_sim2.close()
-        omni_motion.close(port)
+        omni_motion.close()
 
 main_loop()
 
