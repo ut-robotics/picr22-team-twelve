@@ -5,6 +5,7 @@ import numpy as np
 import time
 import tkinter as tk
 import serial
+import serial.tools.list_ports
 
 class IRobotMotion:
     def open(self):
@@ -23,6 +24,18 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
 
     def open(self, port):
         print("Open OmniMotionRobot")
+        # get all the available seiral ports
+        ports = serial.tools.list_ports.comports()
+        # find the correct serial port
+        for p in ports:
+            print(p.device)
+            print(p.hwid)
+            # idProduct=5740 to filter the list given by serial.tools.list_ports.comports(include_links=False)
+            if p.hwid.__contains__("5740"):
+                port = p.device
+                print("Serial port assigned")
+                break
+        # open the serial connection and initialize the serial session (self.ser)
         self.ser = serial.Serial(port)
     def close(self, port):
         print("Close OmniMotionRobot")
