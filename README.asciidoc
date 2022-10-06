@@ -104,4 +104,4 @@ Pille::
 
 Kenno::
 	* Actual robot thrower should be completed. (2h)
-	* Test-robot electronics bolted into the chassis. Minor attachments. (2h)
+	* Test-robot electronics bolted onto the chassis. Minor attachments. (2h)
