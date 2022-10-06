@@ -16,8 +16,8 @@ def move_wheel_s(omnim_robot_instance, start_time, end_time, time_passed, speed1
 def main_loop():
     debug = True
     
-    motion_sim = motion.TurtleRobot()
-    motion_sim2 = motion.TurtleOmniRobot()
+    #motion_sim = motion.TurtleRobot()
+    #motion_sim2 = motion.TurtleOmniRobot()
 
     omni_motion = motion.OmniMotionRobot()
     
