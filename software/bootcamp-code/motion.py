@@ -55,21 +55,20 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
     def move(self, x_speed, y_speed, rot_speed):
         speeds = [0, 0, 0]
         # wheels distance from the center in m
-        wheelDistance = 0.4
+        # wheelDistance = 0.125
 
         # TODO This is where you need to calculate the speeds for robot motors
         robotSpeed = math.sqrt(x_speed*x_speed + y_speed*y_speed)
         robotDirectionAngle = math.atan2(y_speed, x_speed)
         # robot angular speed is basically robot rotational speed
         robotAngularSpeed = rot_speed
-
-        speeds[0] = robotSpeed * math.cos(robotDirectionAngle - self.motor_config[0]) + wheelDistance*robotAngularSpeed
-        speeds[1] = robotSpeed * math.cos(robotDirectionAngle - self.motor_config[1]) + wheelDistance*robotAngularSpeed
-        speeds[2] = robotSpeed * math.cos(robotDirectionAngle - self.motor_config[2]) + wheelDistance*robotAngularSpeed
+        for s in speeds:
+            speeds[s] = robotSpeed * math.cos(robotDirectionAngle - math.radians(self.motor_config[s])) \
+                        + robotAngularSpeed
 
         # send the motor speeds to mainboard
-        self.send_commands(speeds[0], speeds[1], speeds[2])
-        
+        self.send_commands(int(speeds[0]), int(speeds[1]), int(speeds[2]))
+
 
 class TurtleRobot(IRobotMotion):
     def __init__(self, name="Default turtle robot"):

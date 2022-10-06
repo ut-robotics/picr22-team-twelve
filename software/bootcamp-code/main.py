@@ -41,32 +41,64 @@ def main_loop():
     frame_cnt = 0
     try:
         start_time = time.time()
+        state = 0
         while True:
+            # STATE MACHINE: 3 states - FIND_BALL = 0, DRIVE_TO_BALL = 1, ALREADY_HAVE_A_BALL = 2
+
             # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
 
             # TODO This is where you add the driving behaviour of your robot. It should be able to filter out
             # objects of interest and calculate the required motion for reaching the objects
+            print()
 
-            # the biggest ball is the first one in the detected balls list
-            largest_ball_Object = processedData.balls[0]
-            # the coordinates of the largest ball, THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER
-            largest_ball_xco = largest_ball_Object.obj_x
-            largest_ball_yco = largest_ball_Object.obj_y
-            # TODO Using these coordinates calculate the side speed, forward speed and rotation for the robot
-            side_speed = largest_ball_xco
-            forward_speed = largest_ball_yco
-            rotation = 0
+            if state>1:
+                continue
+            elif len(processedData.balls)>0:
+                state=1
+            else:
+                state = 0
 
-            # Drive towards a ball
-            omni_motion.move(side_speed, forward_speed, rotation)
+            # STATE TO FIND THE BALL
+            if state == 0:
+                largest_ball_xco = 0
+                largest_ball_yco = 0
+                rotation = 60
+                omni_motion.move(largest_ball_xco, largest_ball_yco, rotation)
 
+            # STATE TO DRIVE TO BALL
+            elif state == 1:
+                # the biggest ball is the first one in the detected balls list
+                # the coordinates of the largest ball, THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER
+                # Using these coordinates calculate the side speed, forward speed and rotation for the robot
+                largest_ball_Object = processedData.balls[0]
+                # We want the ball to end up in the middle of the frame
+                ball_desired_x = cam.rgb_width/2
+                ball_desired_y = cam.rgb_height/2
+                largest_ball_xco = largest_ball_Object.obj_x
+                largest_ball_yco = largest_ball_Object.obj_y
+                # the destination coordinates are the difference between the ball location and desired location
+                dest_x = ball_desired_x - largest_ball_xco
+                dest_y = ball_desired_y - largest_ball_yco
+                # normalize destination in the [-1;1] range and and then * it with motor max speed
+                # (then the driving is proportional)
+                # speed range for motors is 48 - 2047, we use 100 for max motor speed rn
+                x_speed = (dest_x/cam.rgb_width) * 100
+                y_speed = (dest_y/cam.rgb_height) * 100
+                rotation = 0
+                # Drive towards a ball
+                # side speed is x_speed
+                # forward speed is y_speed
+                # rotation if you want to turn
+                omni_motion.move(x_speed, y_speed, rotation)
+
+
+
+            # for mainboard testing
             # find time passed since the start of program
-            time_passed = time.time() - start_time
-
+            # time_passed = time.time() - start_time
             # move two wheels for 4s
-            move_wheel_s(omni_motion, 0, 4, time_passed, 20, -20)
-
+            # move_wheel_s(omni_motion, 0, 4, time_passed, -20, 20)
 
             frame_cnt +=1
 
