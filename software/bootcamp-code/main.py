@@ -4,6 +4,15 @@ import motion
 import cv2
 import time
 
+# function to move wheel/wheels for given time
+def move_wheel_s(omnim_robot_instance, start_time, end_time, time_passed, speed1=0, speed2=0, speed3=0):
+    if time_passed<start_time:
+        return
+    elif time_passed>end_time:
+        return
+    else:
+        omnim_robot_instance.send_commands(speed1, speed2, speed3, 0)
+
 def main_loop():
     debug = True
     
@@ -20,8 +29,8 @@ def main_loop():
 
     processor.start() # ilma kaamerata hangub siin
 
-    motion_sim.open()
-    motion_sim2.open()
+    #motion_sim.open()
+    #motion_sim2.open()
 
     # open the serial connection
     omni_motion.open()
@@ -55,10 +64,8 @@ def main_loop():
             # find time passed since the start of program
             time_passed = time.time() - start_time
 
-            # move one wheel in forward direction 2s, then other dirction 2s.
-            move_wheel_s(omni_motion, 0, 2, time_passed, 20)
-            move_wheel_s(omni_motion, 2, 4, time_passed, -20)
-            move_wheel_s(omni_motion, 4, 6, time_passed)
+            # move two wheels for 4s
+            move_wheel_s(omni_motion, 0, 4, time_passed, 20, -20)
 
 
             frame_cnt +=1
@@ -89,19 +96,9 @@ def main_loop():
     finally:
         cv2.destroyAllWindows()
         processor.stop()
-        motion_sim.close()
-        motion_sim2.close()
+        #motion_sim.close()
+        #motion_sim2.close()
         omni_motion.close()
 
 main_loop()
-
-# function to move wheel/wheels for given time
-def move_wheel_s(omnim_robot_instance, start_time, end_time, time_passed, speed1=0, speed2=0, speed3=0):
-    if time_passed<start_time:
-        return
-    elif time_passed>end_time:
-        return
-    else:
-        omnim_robot_instance.send_commands(speed1, speed2, speed3, 0)
-    
     
