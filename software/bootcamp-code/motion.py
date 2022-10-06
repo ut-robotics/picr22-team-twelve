@@ -55,42 +55,21 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
     def move(self, x_speed, y_speed, rot_speed):
         speeds = [0, 0, 0]
         # wheels distance from the center in m
-        wheelDistance = 0.3
+        wheelDistance = 0.4
 
         # TODO This is where you need to calculate the speeds for robot motors
         robotSpeed = math.sqrt(x_speed*x_speed + y_speed*y_speed)
         robotDirectionAngle = math.atan2(y_speed, x_speed)
-        # TODO Implement robot angular speed calculations ????????????????????
-        robotAngularSpeed = 0
+        # robot angular speed is basically robot rotational speed
+        robotAngularSpeed = rot_speed
 
         speeds[0] = robotSpeed * math.cos(robotDirectionAngle - self.motor_config[0]) + wheelDistance*robotAngularSpeed
         speeds[1] = robotSpeed * math.cos(robotDirectionAngle - self.motor_config[1]) + wheelDistance*robotAngularSpeed
         speeds[2] = robotSpeed * math.cos(robotDirectionAngle - self.motor_config[2]) + wheelDistance*robotAngularSpeed
 
-        move_speeds = self.speeds_to_direction(speeds)
-
         # send the motor speeds to mainboard
-        self.send_commands(move_speeds[0], move_speeds[1], move_speeds[2])
-
-    def speeds_to_direction(self, speeds):
-        offset_x = 0
-        offset_y = 0
-        degree = int((speeds[0] + speeds[1] + speeds[2]) / 3)
-
-        for i in range(0, 3):
-            end_vector = self.motor_side_forward_scale(self.motor_config[i] + 90, speeds[i], offset_x, offset_y)
-            offset_x = end_vector[0]
-            offset_y = end_vector[1]
-
-        offsets = [offset_x * -1, offset_y]
-        speeds = [int(a / 1.5) for a in offsets]
-        speeds.append(degree)
-
-        return speeds
-
-    def motor_side_forward_scale(self, angel, length, offset_x=0, offset_y=0):
-        ang_rad = math.radians(angel)
-        return [length * math.cos(ang_rad) + offset_x, length * math.sin(ang_rad) + offset_y]
+        self.send_commands(speeds[0], speeds[1], speeds[2])
+        
 
 class TurtleRobot(IRobotMotion):
     def __init__(self, name="Default turtle robot"):
@@ -148,6 +127,9 @@ class TurtleOmniRobot(TurtleRobot):
         speeds = [0, 0, 0]
 
         # This is where you need to calculate the speeds for robot motors
+        speeds[0]=x_speed
+        speeds[1]=y_speed
+        speeds[2]=rot_speed
 
         simulated_speeds = self.speeds_to_direction(speeds)
 
