@@ -59,7 +59,7 @@ Stepan:: Fixed faulty wiring. (1h)
 Pille:: 
 	* Fixed github commit issues I had to upload bootcamp code to the git folder. Connected the mainboard wires to the motors. Works! (0.5h)
 	* Tested serial connection over HTerm and with the bootcamp code task. Works! (0.5h)
-	* Sorted the serial ports so that the robot will always connect to the right port even if the name changes. Next taske is using the camera and detecting the ball. (0.5h)
+	* Sorted the serial ports so that the robot will always connect to the right port even if the name changes. Next task is using the camera and detecting the ball. (0.5h)
 
 === 28.09
 
@@ -81,7 +81,7 @@ Kenno:: Gathering intel from previous years, even more CAD tutorials, thrower is
 
 Pille::
 	* Progress presentation slides, blog entries. Team management. (0.5h)
-	* Edited the code to move wheel for given time. Made a separate funtion to make the code more readable. (0.5h)
+	* Edited the code to move wheel for given time. Made a separate function to make the code more readable. (0.5h)
 
 === 02.10
 
