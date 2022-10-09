@@ -1,0 +1,112 @@
+= This is the documentation file for team TWELVE.
+
+=== Team members and their main roles are:
+
+* Pille Pärnalaas - Programming
+* Kenno Kallastu - Mechanics
+* Stepan Denysenko - Electronics
+
+
+== DAILY BLOG
+
+=== 03.09
+====== BOOTCAMP DAY ONE
+Kenno, Pille:: present and working the tasks (both 8h)
+
+=== 14.09
+First gathering of the team. Divided main roles and started work.
+
+Kenno:: Omnidirectional wheels attached to the chassis along with the motors. Helped with electronics. 
+	Getting familiar with the lab.(1.5h)
+Stepan:: Wired, soldered. (1.5h)
+Pille:: Took home the NUC for initial setup. (1h)
+
+=== 15.09 
+Kenno:: Reading the guides. Rough planning of the design process, was pretty overwhelmed and didn't 
+	understand what was supposed to be done. (1h)
+
+=== 17.09
+
+Pille:: Made an Ubuntu image for the computer. Installed Ubuntu, configured setup.
+	Got some errors when installing the segment module. (1.5h)
+
+=== 18.09
+
+Pille:: Got the bootcamp example code running. Tried to write commands for sending over serial.
+	Need to test out with hardware.
+	Tried to upload daily blog to git, encountered problems.
+	(2h)
+
+=== 19.09
+
+Pille:: project progress presentation + slides (2h)
+Kenno, Stepan:: Present at project progress presentations (1.5h)
+
+=== 20.09
+
+Pille:: working on the git repo issues. Connecting over ssh. (1h)
+
+=== 22.09
+
+Kenno:: Thrower measurements for CAD. Swapped the M3 bolts on the electric motor mount to 
+	shorter ones. (1h10min)
+Pille:: Programming. Got the serial connection working. Needs some additional code to connect even 
+	if the port changes. (2h)
+Stepan:: Fixed faulty wiring. (1h)
+
+=== 26.09
+
+Pille:: 
+	* Fixed github commit issues I had to upload bootcamp code to the git folder. Connected the mainboard wires to the motors. Works! (0.5h)
+	* Tested serial connection over HTerm and with the bootcamp code task. Works! (0.5h)
+	* Sorted the serial ports so that the robot will always connect to the right port even if the name changes. Next task is using the camera and detecting the ball. (0.5h)
+
+=== 28.09
+
+Pille::
+	* Edited the blog with spent time, read the battery instructions. (1h)
+	* Team management. (15min)
+Kenno:: Imported test robot files into Fusion 360, started with the thrower design, watched tutorials. (2h)
+
+=== 29.09
+
+Pille:: Got the battery briefing. Tested the robot with a battery. Found some faulty wiring. (1.5h)
+Stepan:: Got the battery briefing. Tested the robot with a battery. Found out that the on/off switch is faulty and needs to be replaced. (2h)
+
+=== 30.09
+
+Kenno:: Gathering intel from previous years, even more CAD tutorials, thrower is almost ready. (3h)
+
+=== 01.10
+
+Pille::
+	* Progress presentation slides, blog entries. Team management. (0.5h)
+	* Edited the code to move wheel for given time. Made a separate function to make the code more readable. (0.5h)
+
+=== 02.10
+
+Pille:: 
+	* Team management issues. (30min)
+	* Reediting the daily blog (15min)
+	
+=== 03.10
+
+Kenno:: Finished the first thrower design, slides for presentation. (1h)
+
+=== 05.10
+
+Pille:: 
+	* Filling in the project time planning tool, sending to other team members (30min).
+	* Cleaning up the main.py file, moving serial connection to motion class. Starting with driving logic. (30min)
+	* Working on the driving logic, need to figure out the speed calculations. (1h15min)
+
+=== 06.10
+
+Kenno::
+	* Actual robot thrower should be completed. (2h)
+	* Test-robot electronics bolted onto the chassis. Minor attachments. (2h)
+
+Pille:: Programming robot moving logic. (2h)
+
+
+
