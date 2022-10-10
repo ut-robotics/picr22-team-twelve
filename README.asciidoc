@@ -112,4 +112,5 @@ Pille:: Programming robot moving logic. (2h)
 
 Kenno:: 
 	* New test robot thrower as the first design had issues. (2h30min)
+	* Messing with the joining, gave the thrower for first review, needs dogbones to be ready (1h)
 
