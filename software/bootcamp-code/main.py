@@ -75,8 +75,8 @@ def main_loop():
                 # We want the ball to end up in the middle of the frame
                 ball_desired_x = cam.rgb_width/2
                 ball_desired_y = cam.rgb_height/2
-                largest_ball_xco = largest_ball_Object.obj_x
-                largest_ball_yco = largest_ball_Object.obj_y
+                largest_ball_xco = largest_ball_Object.x
+                largest_ball_yco = largest_ball_Object.y
                 # the destination coordinates are the difference between the ball location and desired location
                 dest_x = ball_desired_x - largest_ball_xco
                 dest_y = ball_desired_y - largest_ball_yco
@@ -90,15 +90,16 @@ def main_loop():
                 # side speed is x_speed
                 # forward speed is y_speed
                 # rotation if you want to turn
+                #print("X: ", x_speed, "Y: ", y_speed)
                 omni_motion.move(x_speed, y_speed, rotation)
 
 
 
-            # for mainboard testing
+            # for mainboard testing driving function
             # find time passed since the start of program
             # time_passed = time.time() - start_time
             # move two wheels for 4s
-            # move_wheel_s(omni_motion, 0, 4, time_passed, -20, 20)
+            # move_wheel_s(omni_motion, 0, 4, time_passed, 0, -15, 15)
 
             frame_cnt +=1
 

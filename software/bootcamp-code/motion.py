@@ -67,7 +67,8 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
                         + robotAngularSpeed
 
         # send the motor speeds to mainboard
-        self.send_commands(int(speeds[0]), int(speeds[1]), int(speeds[2]))
+        #print("COMMAND: ", speeds[0], speeds[1], speeds[2])
+        self.send_commands(int(speeds[0]), int(speeds[1]), int(speeds[2]), 0)
 
 
 class TurtleRobot(IRobotMotion):
