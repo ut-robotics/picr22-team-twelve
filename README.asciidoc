@@ -108,5 +108,8 @@ Kenno::
 
 Pille:: Programming robot moving logic. (2h)
 
+=== 10.10
 
+Kenno:: 
+	* New test robot thrower as the first design had issues. (2h30min)
 
