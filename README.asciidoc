@@ -114,3 +114,8 @@ Kenno::
 	* New test robot thrower as the first design had issues. (2h30min)
 	* Messing with the joining, gave the thrower for first review, needs dogbones to be ready (1h)
 
+Pille::
+	* Started re-soldering the test robots battery to NUC connections as one of the plugs was wrong. Stepan took over. (30min)
+	* Trying to get remote access to the robot computer set up. Still doesn't work correctly. (1h15min)
+	* The test robot is finally assembled, I could test the code in action. Robot drives straight and is able to follow the ball. (45min)
+
