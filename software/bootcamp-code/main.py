@@ -4,15 +4,6 @@ import motion
 import cv2
 import time
 
-# function to move wheel/wheels for given time
-def move_wheel_s(omnim_robot_instance, start_time, end_time, time_passed, speed1=0, speed2=0, speed3=0):
-    if time_passed<start_time:
-        return
-    elif time_passed>end_time:
-        return
-    else:
-        omnim_robot_instance.send_commands(speed1, speed2, speed3, 0)
-
 def main_loop():
     debug = True
     
@@ -40,7 +31,9 @@ def main_loop():
     frame = 0
     frame_cnt = 0
     try:
-        start_time = time.time()
+        # time counter for testing
+        zero_time = time.time()
+        
         state = 0
         while True:
             # STATE MACHINE: 3 states - FIND_BALL = 0, DRIVE_TO_BALL = 1, ALREADY_HAVE_A_BALL = 2
@@ -49,8 +42,7 @@ def main_loop():
             processedData = processor.process_frame(aligned_depth=False)
 
             # TODO This is where you add the driving behaviour of your robot. It should be able to filter out
-            # objects of interest and calculate the required motion for reaching the objects
-            print()
+            # objects of interest and calculate the required motion for reaching the object.
 
             if state>1:
                 continue
@@ -59,47 +51,41 @@ def main_loop():
             else:
                 state = 0
 
-            # STATE TO FIND THE BALL
+            # STATE TO FIND THE BALL 0
             if state == 0:
-                largest_ball_xco = 0
-                largest_ball_yco = 0
-                rotation = 60
-                omni_motion.move(largest_ball_xco, largest_ball_yco, rotation)
+                rotation = 15
+                omni_motion.move(0, 0, rotation)
 
-            # STATE TO DRIVE TO BALL
+            # STATE TO DRIVE TO BALL is 1
             elif state == 1:
-                # the biggest ball is the first one in the detected balls list
-                # the coordinates of the largest ball, THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER
-                # Using these coordinates calculate the side speed, forward speed and rotation for the robot
-                largest_ball_Object = processedData.balls[0]
-                # We want the ball to end up in the middle of the frame
+                # The biggest ball is the first one in the detected balls list.
+                # Find the coordinates of the largest ball.
+                # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
+                # Using these coordinates calculate the side speed, forward speed and rotation for the robot.
+                # We want the ball to end up in the middle of the frame.
                 ball_desired_x = cam.rgb_width/2
                 ball_desired_y = cam.rgb_height/2
-                largest_ball_xco = largest_ball_Object.x
-                largest_ball_yco = largest_ball_Object.y
-                # the destination coordinates are the difference between the ball location and desired location
-                dest_x = ball_desired_x - largest_ball_xco
-                dest_y = ball_desired_y - largest_ball_yco
-                # normalize destination in the [-1;1] range and and then * it with motor max speed
+                # The destination coordinates are the difference between the ball location and desired location.
+                dest_x = ball_desired_x - processedData.balls[0].x
+                dest_y = ball_desired_y - processedData.balls[0].y
+                # Normalize destination in the [-1;1] range and and then multiply it with motor max speed.
                 # (then the driving is proportional)
-                # speed range for motors is 48 - 2047, we use 100 for max motor speed rn
+                # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
                 x_speed = (dest_x/cam.rgb_width) * 100
                 y_speed = (dest_y/cam.rgb_height) * 100
                 rotation = 0
-                # Drive towards a ball
-                # side speed is x_speed
-                # forward speed is y_speed
-                # rotation if you want to turn
+                # Drive towards a ball:
+                    # side speed is x_speed
+                    # forward speed is y_speed
+                    # rotation if you want to turn
                 #print("X: ", x_speed, "Y: ", y_speed)
                 omni_motion.move(x_speed, y_speed, rotation)
 
 
 
-            # for mainboard testing driving function
-            # find time passed since the start of program
-            # time_passed = time.time() - start_time
-            # move two wheels for 4s
-            # move_wheel_s(omni_motion, 0, 4, time_passed, 0, -15, 15)
+            # Mainboard and communication testing function.
+            # Move two wheels for 4s. Starting from program start time (zero_time) and duration 0 to 4.
+            # omni_motion.test_moving(zero_time, 0, 4, 0, -15, 15)
 
             frame_cnt +=1
 
