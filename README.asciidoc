@@ -119,3 +119,6 @@ Pille::
 	* Trying to get remote access to the robot computer set up. Still doesn't work correctly. (1h15min)
 	* The test robot is finally assembled, I could test the code in action. Robot drives straight and is able to follow the ball. (45min)
 
+=== 12.10
+
+Pille:: Editing the code as requested by the instructor. (1h)
