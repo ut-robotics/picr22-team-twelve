@@ -33,6 +33,9 @@ def main_loop():
     try:
         # time counter for testing
         zero_time = time.time()
+        # Ball desired coordinates are in the middle of the frame.
+        ball_desired_x = cam.rgb_width/2
+        ball_desired_y = cam.rgb_height/2
         
         state = 0
         while True:
@@ -62,9 +65,7 @@ def main_loop():
                 # Find the coordinates of the largest ball.
                 # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
                 # Using these coordinates calculate the side speed, forward speed and rotation for the robot.
-                # We want the ball to end up in the middle of the frame.
-                ball_desired_x = cam.rgb_width/2
-                ball_desired_y = cam.rgb_height/2
+                
                 # The destination coordinates are the difference between the ball location and desired location.
                 dest_x = ball_desired_x - processedData.balls[0].x
                 dest_y = ball_desired_y - processedData.balls[0].y
