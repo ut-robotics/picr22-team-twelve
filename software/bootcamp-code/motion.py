@@ -75,7 +75,7 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
         robotDirectionAngle = math.atan2(y_speed, x_speed)
         # robot angular speed is basically robot rotational speed
         robotAngularSpeed = rot_speed
-        for s in speeds:
+        for s in range(len(speeds)):
             speeds[s] = robotSpeed * math.cos(robotDirectionAngle - math.radians(self.motor_config[s])) \
                         + robotAngularSpeed
 
