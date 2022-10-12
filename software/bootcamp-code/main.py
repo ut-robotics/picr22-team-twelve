@@ -3,6 +3,13 @@ import camera
 import motion
 import cv2
 import time
+from enum import Enum
+
+# STATE MACHINE: 3 states - FIND_BALL = 0, CENTER_BALL = 1, DRIVE_TO_BALL = 2
+class State(Enum):
+    FIND_BALL = 0
+    CENTER_BALL = 1
+    DRIVE_TO_BALL = 2
 
 def main_loop():
     debug = True
@@ -25,6 +32,8 @@ def main_loop():
 
     # open the serial connection
     omni_motion.open()
+    
+    state=State.FIND_BALL
 
     start = time.time()
     fps = 0
@@ -37,30 +46,23 @@ def main_loop():
         ball_desired_x = cam.rgb_width/2
         ball_desired_y = cam.rgb_height/2
         
-        state = 0
         while True:
-            # STATE MACHINE: 3 states - FIND_BALL = 0, DRIVE_TO_BALL = 1, ALREADY_HAVE_A_BALL = 2
-
             # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
 
             # TODO This is where you add the driving behaviour of your robot. It should be able to filter out
             # objects of interest and calculate the required motion for reaching the object.
 
-            if state>1:
-                continue
-            elif len(processedData.balls)>0:
-                state=1
-            else:
-                state = 0
-
             # STATE TO FIND THE BALL 0
-            if state == 0:
+            if state == State.FIND_BALL:
+                if len(processedData.balls)>0:
+                    state=State.CENTER_BALL
+                    continue
                 rotation = 15
                 omni_motion.move(0, 0, rotation)
 
             # STATE TO DRIVE TO BALL is 1
-            elif state == 1:
+            elif state == State.CENTER_BALL:
                 # The biggest ball is the first one in the detected balls list.
                 # Find the coordinates of the largest ball.
                 # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
@@ -74,15 +76,14 @@ def main_loop():
                 # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
                 x_speed = (dest_x/cam.rgb_width) * 100
                 y_speed = (dest_y/cam.rgb_height) * 100
-                rotation = 0
+                #rotation = 0
                 # Drive towards a ball:
                     # side speed is x_speed
                     # forward speed is y_speed
                     # rotation if you want to turn
                 #print("X: ", x_speed, "Y: ", y_speed)
-                omni_motion.move(x_speed, y_speed, rotation)
-
-
+                omni_motion.move(x_speed, y_speed, 0)
+                
 
             # Mainboard and communication testing function.
             # Move two wheels for 4s. Starting from program start time (zero_time) and duration 0 to 4.
