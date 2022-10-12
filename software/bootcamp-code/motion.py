@@ -7,6 +7,7 @@ import tkinter as tk
 import serial
 import serial.tools.list_ports
 import math
+import time
 
 class IRobotMotion:
     def open(self):
@@ -44,6 +45,18 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
     def close(self):
         print("Close OmniMotionRobot")
         self.ser.close()
+    
+    # function to move wheel/wheels for given time
+    # start_time is the time for starting the movement, end_time is the time which movement end (time=time from start of prgr)
+    # time_passed is the counter for how long has the movement happened
+    def test_moving(zero_time, start_time, end_time, speed1=0, speed2=0, speed3=0):
+        time_passed = time.time() - zero_time
+        if time_passed<start_time:
+            return
+        elif time_passed>end_time:
+            return
+        else:
+            self.send_commands(speed1, speed2, speed3, 0)
 
     # new method for sending commands to the mainboard over serial
     # Speed values are between 48 - 2047 for 0 to 100% speed
