@@ -126,3 +126,7 @@ Pille:: Editing the code as requested by the instructor. (1h)
 === 13.10
 
 Pille:: Screwing in final bolts to the test-robot frame. (20min)
+
+=== 16.10
+
+Pille:: Progress presentation slides for monday. (20min)
