@@ -136,3 +136,7 @@ Pille:: Progress presentation slides for monday. (20min)
 === 17.10
 
 Kenno:: On-site presentation and valuable info for the team. (1h15min)
+
+=== 18.10
+
+Kenno:: Fixed the thrower issues that were pointed out after the review. (2h)
