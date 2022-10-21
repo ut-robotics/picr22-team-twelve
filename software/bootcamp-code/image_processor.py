@@ -74,6 +74,8 @@ class ImageProcessor():
         self.camera.close()
 
     def analyze_balls(self, t_balls, fragments) -> list:
+        kernel=np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]], dtype=np.uint8)
+        t_balls=cv2.dilate(t_balls, kernel, iterations=1)
         contours, hierarchy = cv2.findContours(t_balls, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         balls = []
@@ -85,7 +87,7 @@ class ImageProcessor():
 
             size = cv2.contourArea(contour)
 
-            if size < 15:
+            if size < 8:
                 continue
 
             x, y, w, h = cv2.boundingRect(contour)
@@ -96,6 +98,9 @@ class ImageProcessor():
             obj_x = int(x + (w/2))
             obj_y = int(y + (h/2))
             obj_dst = obj_y
+
+            if obj_y<100:
+                continue
 
             if self.debug:
                 self.debug_frame[ys, xs] = [0, 0, 0]
