@@ -144,3 +144,8 @@ Kenno:: Fixed the thrower issues that were pointed out after the review. (2h)
 === 19.10
 
 Kenno:: Fixed the new issues of the thrower. (1h)
+
+=== 20.10
+
+Pille:: Programming the ball following logic, presenting to the instructor. Calibrating color configuration. (2.5h)
+
