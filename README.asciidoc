@@ -149,3 +149,7 @@ Kenno:: Fixed the new issues of the thrower. (1h)
 
 Pille:: Programming the ball following logic, presenting to the instructor. Calibrating color configuration. (2.5h)
 
+=== 26.10
+
+Kenno:: First CAM for the test robot thrower done. (2h)
+
