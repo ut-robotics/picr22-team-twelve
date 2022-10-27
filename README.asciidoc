@@ -153,3 +153,6 @@ Pille:: Programming the ball following logic, presenting to the instructor. Cali
 
 Kenno:: First CAM for the test robot thrower done. (2h)
 
+=== 27.10
+
+Kenno:: CAM final adjustments and milling out the parts. (2h)
