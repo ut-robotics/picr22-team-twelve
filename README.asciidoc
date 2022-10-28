@@ -156,3 +156,4 @@ Kenno:: First CAM for the test robot thrower done. (2h)
 === 27.10
 
 Kenno:: CAM final adjustments and milling out the parts. (2h)
+Pille:: Onsite code testing. Color configurations, trying to setup remote acces with camera view. Failed. (1h)
