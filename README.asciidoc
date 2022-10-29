@@ -162,6 +162,6 @@ Pille:: Onsite code testing. Color configurations, trying to setup remote acces 
 
 Pille:: 
 	* Slides for mondays presentation. Uploading video. (20min)
-	* Starting the programming on robot finding basket. How to orbit? (30min)
+	* Starting the programming on robot finding basket. How to orbit? (45min)
 
 
