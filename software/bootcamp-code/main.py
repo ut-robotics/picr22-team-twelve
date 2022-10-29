@@ -120,13 +120,23 @@ def main_loop():
                 if len(processedData.balls)<1:
                     state=State.FIND_BALL
                     continue
+                    
+                orbit_speed = max_motor_speed/15
                 
                 # find blue basket
                 if len(processedData.basket_b>0): # or processedData.basket_m>0)
                     # center the basket with orbiting
-                else:
+                    center_frame=ball_desired_x
+                    # the normalized destination x range is -0.05 to 0.05, if the x location is out of that range - orbit
+                    if -0.05 > ((center_frame - processedData.basket_b[-1].x) / cam.rgb_width) > 0.05:
+                        omni_motion.move(orbit_speed, 0, orbit_speed)
+                    else:
+                        state=State.STOP
                     
                 # otherwise orbit the ball until basket is found
+                # y - forward speed 0, x and rotation have speed as it turns and moves sideways when orbiting
+                else:
+                   omni_motion.move(orbit_speed, 0, orbit_speed)
                 
                 
             """
@@ -143,11 +153,11 @@ def main_loop():
                 # if its close enough drive onto it
                 else processedData.balls[0].distance<400:
                     omni_motion.move(0, -3, 0)
-
+            """
+            
             elif state==State.STOP:
                 print(state)
                 omni_motion.move(0, 0, 0)
-            """
                 
 
             # Mainboard and communication testing function.
