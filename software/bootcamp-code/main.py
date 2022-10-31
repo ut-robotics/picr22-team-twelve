@@ -131,29 +131,18 @@ def main_loop():
                     if -0.05 > ((center_frame - processedData.basket_b[-1].x) / cam.rgb_width) > 0.05:
                         omni_motion.move(orbit_speed, 0, orbit_speed)
                     else:
-                        state=State.STOP
+                        state=State.THROW_BALL
                     
                 # otherwise orbit the ball until basket is found
                 # y - forward speed 0, x and rotation have speed as it turns and moves sideways when orbiting
                 else:
                    omni_motion.move(orbit_speed, 0, orbit_speed)
-                
-                
-            """
-            elif state==State.DRIVE_TO_BALL:
+            
+            # TODO: implement ball throwing logic
+            # drive ontop of the ball and throw it. How to know when the ball has been thrown?
+            elif state==State.THROW_BALL:
                 print(state)
-                if len(processedData.balls)<1:
-                    state=state.FIND_BALL
-                    continue
-                # if the ball is further than 10cm and not quite centered, center it
-                elif -0.05 > ((ball_desired_x - processedData.balls[-1].x) / cam.rgb_width) > 0.05 \
-                        and processedData.balls[0].distance<400:
-                    state=state.CENTER_BALL
-                    # print((ball_desired_x - processedData.balls[-1].x) / cam.rgb_width)
-                # if its close enough drive onto it
-                else processedData.balls[0].distance<400:
-                    omni_motion.move(0, -3, 0)
-            """
+                omni_motion.move(0, 0, 0)
             
             elif state==State.STOP:
                 print(state)
