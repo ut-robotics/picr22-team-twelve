@@ -164,4 +164,8 @@ Pille::
 	* Slides for mondays presentation. Uploading video. (20min)
 	* Starting the programming on robot finding basket. How to orbit? (45min)
 
+=== 30.10
+
+Stepan:: Started working on PCB schematics. (10h)
+
 
