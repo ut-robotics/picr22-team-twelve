@@ -175,4 +175,4 @@ Pille:: Presentation on site. (1h)
 === 01.11
 
 Kenno:: Attached the thrower to the test robot. (3h)
-Pille:: Modification of the code after feedback from instructor. (1h)
+Pille:: Modification of the code after feedback from instructor. (30min)
