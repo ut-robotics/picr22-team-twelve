@@ -170,4 +170,4 @@ Stepan:: Started working on PCB schematics. (10h)
 
 === 01.11
 
-Kenno:: Attached the thrower to the test robot (3h)
+Kenno:: Attached the thrower to the test robot. (3h)
