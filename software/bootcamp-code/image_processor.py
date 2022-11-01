@@ -20,7 +20,8 @@ class Object():
     def __repr__(self) -> str:
         return "[Object: x={}; y={}; size={}; distance={}; exists={}]".format(self.x, self.y, self.size, self.distance, self.exists)
 
-
+# static variable for kernel in image dilation
+static kernel=np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]], dtype=np.uint8)
 # results object of image processing. contains coordinates of objects and frame data used for these results
 class ProcessedResults():
 
@@ -74,8 +75,9 @@ class ImageProcessor():
         self.camera.close()
 
     def analyze_balls(self, t_balls, fragments) -> list:
-        kernel=np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]], dtype=np.uint8)
+        # dilate the contour to find it better
         t_balls=cv2.dilate(t_balls, kernel, iterations=1)
+        
         contours, hierarchy = cv2.findContours(t_balls, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         balls = []
@@ -98,8 +100,9 @@ class ImageProcessor():
             obj_x = int(x + (w/2))
             obj_y = int(y + (h/2))
             obj_dst = obj_y
-
-            if obj_y<100:
+            
+            # if the object found is in the upper fifth of the image, don't consider it as a ball
+            if obj_y<(self.camera.rgb_height/5):
                 continue
 
             if self.debug:
