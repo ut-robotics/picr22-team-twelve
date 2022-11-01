@@ -8,10 +8,14 @@ from enum import Enum
 # STATE MACHINE: 
 class State(Enum):
     FIND_BALL = 0
-    CENTER_BALL = 1
+    MOVE_CENTER_BALL = 1
     FIND_BASKET = 2
     THROW_BALL = 3
     STOP = 4
+    
+class BasketColor(Enum):
+    MAGENTA = 1
+    BLUE = 2
 
 def main_loop():
     debug = False
@@ -41,16 +45,21 @@ def main_loop():
     fps = 0
     frame = 0
     frame_cnt = 0
-    try:
-        # time counter for testing
-        zero_time = time.time()
-        # Ball desired coordinates are in the middle of the frame width and 83% of frame height
-        # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
-        ball_desired_x = cam.rgb_width/2
-        ball_desired_y = cam.rgb_height/1.2
-        # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
-        max_motor_speed = 100
+    
+    # time counter for testing
+    # zero_time = time.time()
         
+    # Ball desired coordinates are in the middle of the frame width and 83% of frame height
+    # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
+    ball_desired_x = cam.rgb_width/2
+    ball_desired_y = cam.rgb_height/1.2
+    center_frame=ball_desired_x
+    # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
+    max_motor_speed = 100
+    # variable to store target basket color, currently blue for testing
+    basketColor = BasketColor.BLUE
+    
+    try:        
         while True:
             # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
@@ -62,14 +71,14 @@ def main_loop():
                 print(state)
                 # if we have a ball in view, center it
                 if len(processedData.balls)>0:
-                    state=State.CENTER_BALL
+                    state=State.MOVE_CENTER_BALL
                     continue
                 # if no ball found, rotate
                 rotation = max_motor_speed/15
                 omni_motion.move(0, 0, rotation)
 
-            # STATE TO CENTER THE BALL
-            elif state == State.CENTER_BALL:
+            # STATE TO MOVE TO AND CENTER THE BALL
+            elif state == State.MOVE_CENTER_BALL:
                 print(state)
                 # if there are no balls, then find one
                 if len(processedData.balls)<1:
@@ -77,36 +86,23 @@ def main_loop():
                     continue
                     
                 # The biggest ball is the last one in the detected balls list.
-                # Get the coordinates of the largest ball.
-                # Using these coordinates calculate the side speed, forward speed and rotation for the robot.
+                # Using the coordinates of the biggest ball calculate the side speed, forward speed and rotation for the robot.
                 
                 # The destination coordinates are the difference between the ball location and desired location.
-                # print(processedData.balls)
                 dest_x = ball_desired_x - processedData.balls[-1].x
                 dest_y = ball_desired_y - processedData.balls[-1].y
-
-                # Normalize destination in the [-1;1] range and and then multiply it with motor max speed.
-                # (then the driving is proportional)
-
-                # print(processedData.balls[-1].x)
-                # print(dest_x)
-                # print(dest_x/cam.rgb_width)
-                
-                # if the distance of the biggest ball found, try finding one nearer
+              
+                # if ball is close enough, circle it and find a basket (the distance is from the 0 coordinate - closer is larger value)
                 if processedData.balls[-1].distance>500:
-                    state=State.FIND_BALL
-                # if ball is close enough, circle it and find a basket
-                elif processedData.balls[-1].distance<400:
                     state=State.FIND_BASKET
                     continue
-                # else drive to and center the ball simultaniously
+                # else simultaniously drive to and center the ball
                 else:
                     # Normalize destination in the [-1;1] range and and then multiply it with motor max speed.
                     # (then the driving is proportional)
                     x_speed = (dest_x/cam.rgb_width) * max_motor_speed
                     y_speed = (dest_y/cam.rgb_height) * max_motor_speed
-                    # rotation = 0
-                    # Drive towards a ball:
+                    # Driving towards a ball:
                         # side speed is x_speed
                         # forward speed is y_speed
                         # rotation if you want to turn
@@ -124,17 +120,17 @@ def main_loop():
                 orbit_speed = max_motor_speed/15
                 
                 # find blue basket
-                if len(processedData.basket_b>0): # or processedData.basket_m>0)
-                    # center the basket with orbiting
-                    center_frame=ball_desired_x
-                    # the normalized destination x range is -0.05 to 0.05, if the x location is out of that range - orbit
-                    if -0.05 > ((center_frame - processedData.basket_b[-1].x) / cam.rgb_width) > 0.05:
-                        omni_motion.move(orbit_speed, 0, orbit_speed)
-                    else:
-                        state=State.THROW_BALL
+                if basketColor==basketColor.BLUE:
+                    if len(processedData.basket_b>0): # or processedData.basket_m>0)
+                        # center the basket with orbiting
+                        # the normalized destination x range is -0.05 to 0.05, if the x location is out of that range - orbit
+                        if -0.05 > ((center_frame - processedData.basket_b[-1].x) / cam.rgb_width) > 0.05:
+                            omni_motion.move(orbit_speed, 0, orbit_speed)
+                        else:
+                            state=State.THROW_BALL
                     
                 # otherwise orbit the ball until basket is found
-                # y - forward speed 0, x and rotation have speed as it turns and moves sideways when orbiting
+                # y(forward speed) = 0; x and rotation have speed as it turns and moves sideways at the same time when orbiting
                 else:
                    omni_motion.move(orbit_speed, 0, orbit_speed)
             
@@ -142,7 +138,7 @@ def main_loop():
             # drive ontop of the ball and throw it. How to know when the ball has been thrown?
             elif state==State.THROW_BALL:
                 print(state)
-                omni_motion.move(0, 0, 0)
+                state=State.FIND_BALL
             
             elif state==State.STOP:
                 print(state)
