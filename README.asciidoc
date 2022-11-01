@@ -168,6 +168,11 @@ Pille::
 
 Stepan:: Started working on PCB schematics. (10h)
 
+=== 31.10
+
+Pille:: Presentation on site. (1h)
+
 === 01.11
 
 Kenno:: Attached the thrower to the test robot. (3h)
+Pille:: Modification of the code after feedback from instructor. (1h)
