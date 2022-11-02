@@ -6,6 +6,8 @@
 * Kenno Kallastu - Mechanics
 * Stepan Denysenko - Electronics
 
+=== Public Fusion 360 project for mechanics
+https://a360.co/3haaYUI
 
 == DAILY BLOG
 
