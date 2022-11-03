@@ -182,4 +182,6 @@ Pille:: Modification of the code after feedback from instructor. (30min)
 
 === 03.11
 
-Pille:: Programming the ball throwing logic. Still have questions. (1h)
+Pille:: 
+	* Programming the ball throwing logic. Still have questions. (1h)
+	* Programming adding referee command listening (30min)
