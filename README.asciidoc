@@ -184,4 +184,6 @@ Pille:: Modification of the code after feedback from instructor. (30min)
 
 Pille:: 
 	* Programming the ball throwing logic. Still have questions. (1h)
-	* Programming adding referee command listening (30min)
+	* Programming - adding referee command listening (30min)
+	* Programming on site - trying to get camera image when remote connection, failed, still have qt5 error. (1h30min)
+	* Programming on site - testing the code, rewriting logic to find basket and orbit the ball. It is now proportional. (2h)
