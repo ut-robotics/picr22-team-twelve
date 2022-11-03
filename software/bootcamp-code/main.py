@@ -35,7 +35,7 @@ def state_printer(state, last_state, new_state):
     return state, last_state, new_state
 
 def main_loop():
-    debug = True
+    debug = False
     
     #motion_sim = motion.TurtleRobot()
     #motion_sim2 = motion.TurtleOmniRobot()
@@ -79,13 +79,13 @@ def main_loop():
     ball_desired_y = cam.rgb_height/1.2
 
     # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
-    max_motor_speed = 100
+    max_motor_speed = 80
     # rotation speed for find ball state
-    find_rotation_speed = max_motor_speed/15
+    find_rotation_speed = max_motor_speed/6
     # variable to store target basket color, currently blue for testing
     basketColor = BasketColor.BLUE
     # orbiting speed for centering the basket
-    orbit_speed = max_motor_speed/4
+    orbit_speed = max_motor_speed/1.5
     # start time variable for thrower state
     throw_start=0
     # true false variable to keep track if when throwing, the ball has left the camera frame
@@ -162,7 +162,7 @@ def main_loop():
                     
                 # find blue basket
                 if basketColor==basketColor.BLUE:
-                    x_speed_prop = (processedData.balls[-1].x - cam.rgb_width) / cam.rgb_width
+                    x_speed_prop = (processedData.balls[-1].x - 0) / cam.rgb_width
                     if processedData.basket_b.exists:
                         x_speed_prop=(processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
                     # or processedData.basket_m>0)
@@ -170,18 +170,17 @@ def main_loop():
                     # the normalized destination x range is -0.05 to 0.05, if the x location is out of that range - orbit
                     ball_offset_dist=processedData.balls[-1].distance-400
                     y_speed_prop=ball_offset_dist/(cam.rgb_height-400)
-                    rot_speed_prop=processedData.balls[-1].x - ball_desired_x
+                    rot_speed_prop= (ball_desired_x - processedData.balls[-1].x)/cam.rgb_width
 
                     if -0.05>x_speed_prop>0.05 and -0.05>y_speed_prop>0.05 and ball_offset_dist>=0:
                         state = State.THROW_BALL
                         continue
-
                     omni_motion.move(orbit_speed*x_speed_prop, orbit_speed*y_speed_prop, orbit_speed*rot_speed_prop)
 
 
             # drive ontop of the ball and throw it.
             elif state==State.THROW_BALL:
-                state, last_state, new_state =  state_printer(state, last_state, new_state)
+                state, last_state, new_state = state_printer(state, last_state, new_state)
                 
                 # enters the if statement once to start the throw timer when the ball is out of frame
                 if ball_out_of_frame==False and len(processedData.balls)<1:
