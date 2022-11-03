@@ -8,11 +8,11 @@ import asyncio #for referee commands over websockets
 import websockets #before use: pip3.9 install websockets
 import json #for parsing referee commands into python library
 
-async def listen_referee(command_list):
-    async with websockets.connect('ws://localhost:8888') as websocket:
+"""async def listen_referee(command_list):
+    async with websockets.connect('ws://localhost:8008') as websocket:
         command = await websocket.recv()
         command_list.append(command)
-
+"""
 # STATE MACHINE: 
 class State(Enum):
     FIND_BALL = 0
@@ -26,7 +26,7 @@ class BasketColor(Enum):
     BLUE = 2
 
 def main_loop():
-    debug = False
+    debug = True
     
     #motion_sim = motion.TurtleRobot()
     #motion_sim2 = motion.TurtleOmniRobot()
@@ -49,9 +49,9 @@ def main_loop():
     
     command_list=[]
     # listen for referee commands
-    asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
+    #asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
-    referee=json.loads(command_list[0])
+    #referee=json.loads(command_list[0])
     #if referee["signal"] == "start": state=State.FIND_BALL
     #else: state=State.STOP
     state=State.FIND_BALL
@@ -78,7 +78,7 @@ def main_loop():
     # orbiting speed for centering the basket
     orbit_speed = max_motor_speed/15
     # start time variable for thrower state
-    throw_start=MAX_INT
+    throw_start=0
     # true false variable to keep track if when throwing, the ball has left the camera frame
     ball_out_of_frame=False
     # when throwing the ball, the speed which the robot moves forward
@@ -122,7 +122,7 @@ def main_loop():
                 dest_y = ball_desired_y - processedData.balls[-1].y
               
                 # if ball is close enough, circle it and find a basket (the distance is from the 0 coordinate - closer is larger value)
-                if processedData.balls[-1].distance>500:
+                if processedData.balls[-1].distance>400:
                     state=State.FIND_BASKET
                     continue
                 # else simultaniously drive to and center the ball
@@ -148,18 +148,21 @@ def main_loop():
                     
                 # find blue basket
                 if basketColor==basketColor.BLUE:
-                    if len(processedData.basket_b>0): # or processedData.basket_m>0)
+                    if processedData.basket_b.exists:
+                        # or processedData.basket_m>0)
                         # center the basket with orbiting
                         # the normalized destination x range is -0.05 to 0.05, if the x location is out of that range - orbit
-                        if -0.05 > ((center_frame - processedData.basket_b[-1].x) / cam.rgb_width) > 0.05:
+                        if -0.05 > ((center_frame - processedData.basket_b.x) / cam.rgb_width) > 0.05:
                             omni_motion.move(orbit_speed, 0, orbit_speed)
+                        elif -0.05 > ((center_frame - processedData.balls[-1].x) / cam.rgb_width) > 0.05:
+                            state=State.MOVE_CENTER_BALL
                         else:
                             state=State.THROW_BALL                           
                     
                 # otherwise orbit the ball until basket is found
                 # y(forward speed) = 0; x and rotation have speed as it turns and moves sideways at the same time when orbiting
-                else:
-                   omni_motion.move(orbit_speed, 0, orbit_speed)
+                    else:
+                        omni_motion.move(orbit_speed, 0, orbit_speed)
             
 
             # drive ontop of the ball and throw it.
@@ -172,10 +175,10 @@ def main_loop():
                     throw_start=time.time()
                 
                 # if the ball is out of frame then the throw duration should be bigger than 1.2
-                throw_duratin=time.time()-throw_start
+                throw_duration=time.time()-throw_start
                 if throw_duration>1.2 and ball_out_of_frame==True:
                     state=State.FIND_BALL
-                    throw_start=MAX_INT
+                    throw_start=0
                     ball_out_of_frame=False
                     continue
                 
@@ -191,7 +194,7 @@ def main_loop():
                     ball_dist_norm = (ball_max_distance-processedData.balls[-1].distance)/ball_max_distance
                     # proportional speed to the distance of the ball
                     throw_motor_speed = ball_dist_norm*throw_motor_speed_max
-                    omni_motion.move(0, -throw_forward_speed, 0, throw_motor_speed)
+                    omni_motion.move(0, -1*throw_forward_speed, 0, throw_motor_speed)
                 
             
             elif state==State.STOP:

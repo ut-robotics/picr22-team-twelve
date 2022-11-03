@@ -65,7 +65,7 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
         command = struct.pack('<hhhHBH', speed1, speed2, speed3, thrower_speed, disable_failsafe, 0xAAAA)
         self.ser.write(command)
 
-    def move(self, x_speed, y_speed, rot_speed):
+    def move(self, x_speed, y_speed, rot_speed, thrower_speed=0):
         speeds = [0, 0, 0]
         # wheels distance from the center in m
         # wheelDistance = 0.125
@@ -81,7 +81,7 @@ class OmniMotionRobot(IRobotMotion): #extension of the IRobotMotion
 
         # send the motor speeds to mainboard
         #print("COMMAND: ", speeds[0], speeds[1], speeds[2])
-        self.send_commands(int(speeds[0]), int(speeds[1]), int(speeds[2]), 0)
+        self.send_commands(int(speeds[0]), int(speeds[1]), int(speeds[2]), int(thrower_speed))
 
 
 class TurtleRobot(IRobotMotion):

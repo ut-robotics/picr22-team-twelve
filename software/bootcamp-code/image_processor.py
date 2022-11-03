@@ -21,7 +21,7 @@ class Object():
         return "[Object: x={}; y={}; size={}; distance={}; exists={}]".format(self.x, self.y, self.size, self.distance, self.exists)
 
 # static variable for kernel in image dilation
-static kernel=np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]], dtype=np.uint8)
+kernel=np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]], dtype=np.uint8)
 # results object of image processing. contains coordinates of objects and frame data used for these results
 class ProcessedResults():
 
