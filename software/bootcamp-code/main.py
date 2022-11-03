@@ -8,11 +8,10 @@ import asyncio #for referee commands over websockets
 import websockets #before use: pip3.9 install websockets
 import json #for parsing referee commands into python library
 
-# global variable for storing referee commands
-global command=""
-async def listen_referee():
+async def listen_referee(command_list):
     async with websockets.connect('ws://localhost:8888') as websocket:
         command = await websocket.recv()
+        command_list.append(command)
 
 # STATE MACHINE: 
 class State(Enum):
@@ -48,10 +47,11 @@ def main_loop():
     # open the serial connection
     omni_motion.open()
     
+    command_list=[]
     # listen for referee commands
-    asyncio.get_event_loop().run_until_complete(listen_referee())
+    asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
-    referee=json.loads(command)
+    referee=json.loads(command_list[0])
     #if referee["signal"] == "start": state=State.FIND_BALL
     #else: state=State.STOP
     state=State.FIND_BALL
