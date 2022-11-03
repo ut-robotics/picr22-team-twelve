@@ -3,7 +3,16 @@ import camera
 import motion
 import cv2
 import time
-from enum import Enum
+from enum import Enum # for state machine enumerate
+import asyncio #for referee commands over websockets
+import websockets #before use: pip3.9 install websockets
+import json #for parsing referee commands into python library
+
+# global variable for storing referee commands
+global command=""
+async def listen_referee():
+    async with websockets.connect('ws://localhost:8888') as websocket:
+        command = await websocket.recv()
 
 # STATE MACHINE: 
 class State(Enum):
@@ -39,6 +48,12 @@ def main_loop():
     # open the serial connection
     omni_motion.open()
     
+    # listen for referee commands
+    asyncio.get_event_loop().run_until_complete(listen_referee())
+    # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
+    referee=json.loads(command)
+    #if referee["signal"] == "start": state=State.FIND_BALL
+    #else: state=State.STOP
     state=State.FIND_BALL
 
     start = time.time()
