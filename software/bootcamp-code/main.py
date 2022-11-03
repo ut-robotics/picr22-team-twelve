@@ -56,8 +56,22 @@ def main_loop():
     center_frame=ball_desired_x
     # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
     max_motor_speed = 100
+    # rotation speed for find ball state
+    find_rotation_speed = max_motor_speed/15
     # variable to store target basket color, currently blue for testing
     basketColor = BasketColor.BLUE
+    # orbiting speed for centering the basket
+    orbit_speed = max_motor_speed/15
+    # start time variable for thrower state
+    throw_start=MAX_INT
+    # true false variable to keep track if when throwing, the ball has left the camera frame
+    ball_out_of_frame=False
+    # when throwing the ball, the speed which the robot moves forward
+    throw_forward_speed=max_motor_speed/8
+    # the maximum distance of the ball (y zero coordinate is in the upper edge of the frame)
+    ball_max_distance=cam.rgb_height
+    # maximum speed to throw the ball
+    throw_motor_speed_max=max_motor_speed/2
     
     try:        
         while True:
@@ -74,8 +88,8 @@ def main_loop():
                     state=State.MOVE_CENTER_BALL
                     continue
                 # if no ball found, rotate
-                rotation = max_motor_speed/15
-                omni_motion.move(0, 0, rotation)
+                
+                omni_motion.move(0, 0, find_rotation_speed)
 
             # STATE TO MOVE TO AND CENTER THE BALL
             elif state == State.MOVE_CENTER_BALL:
@@ -117,8 +131,6 @@ def main_loop():
                     state=State.FIND_BALL
                     continue
                     
-                orbit_speed = max_motor_speed/15
-                
                 # find blue basket
                 if basketColor==basketColor.BLUE:
                     if len(processedData.basket_b>0): # or processedData.basket_m>0)
@@ -127,18 +139,45 @@ def main_loop():
                         if -0.05 > ((center_frame - processedData.basket_b[-1].x) / cam.rgb_width) > 0.05:
                             omni_motion.move(orbit_speed, 0, orbit_speed)
                         else:
-                            state=State.THROW_BALL
+                            state=State.THROW_BALL                           
                     
                 # otherwise orbit the ball until basket is found
                 # y(forward speed) = 0; x and rotation have speed as it turns and moves sideways at the same time when orbiting
                 else:
                    omni_motion.move(orbit_speed, 0, orbit_speed)
             
-            # TODO: implement ball throwing logic
-            # drive ontop of the ball and throw it. How to know when the ball has been thrown?
+
+            # drive ontop of the ball and throw it.
             elif state==State.THROW_BALL:
                 print(state)
-                state=State.FIND_BALL
+                
+                # enters the if statement once to start the throw timer when the ball is out of frame
+                if ball_out_of_frame==False and len(processedData.balls)<1:
+                    ball_out_of_frame=True
+                    throw_start=time.time()
+                
+                # if the ball is out of frame then the throw duration should be bigger than 1.2
+                throw_duratin=time.time()-throw_start
+                if throw_duration>1.2 and ball_out_of_frame==True:
+                    state=State.FIND_BALL
+                    throw_start=MAX_INT
+                    ball_out_of_frame=False
+                    continue
+                
+                elif ball_out_of_frame==True:
+                    omni_motion.move(0, -throw_forward_speed, 0, throw_motor_speed)
+                
+                #when the ball is in view, calculate proportional speed for the thrower
+                else:
+                    #?????? For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance. 
+                    # Based on that you can either estimate a function or linearly interpolate the speeds. - Don't understand
+                    
+                    # normalize the ball distance from the robot to the 0-1 range
+                    ball_dist_norm = (ball_max_distance-processedData.balls[-1].distance)/ball_max_distance
+                    # proportional speed to the distance of the ball
+                    throw_motor_speed = ball_dist_norm*throw_motor_speed_max
+                    omni_motion.move(0, -throw_forward_speed, 0, throw_motor_speed)
+                
             
             elif state==State.STOP:
                 print(state)
@@ -164,9 +203,7 @@ def main_loop():
 
             if debug:
                 debug_frame = processedData.debug_frame
-
                 cv2.imshow('debug', debug_frame)
-
                 k = cv2.waitKey(1) & 0xff
                 if k == ord('q'):
                     break
