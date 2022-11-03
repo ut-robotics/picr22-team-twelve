@@ -153,7 +153,7 @@ def main_loop():
                         # center the basket with orbiting
                         # the normalized destination x range is -0.05 to 0.05, if the x location is out of that range - orbit
                         if -0.05 > ((center_frame - processedData.basket_b.x) / cam.rgb_width) > 0.05:
-                            omni_motion.move(orbit_speed, 0, orbit_speed)
+                            omni_motion.move(orbit_speed*3, 0, orbit_speed)
                         elif -0.05 > ((center_frame - processedData.balls[-1].x) / cam.rgb_width) > 0.05:
                             state=State.MOVE_CENTER_BALL
                         else:
@@ -162,7 +162,7 @@ def main_loop():
                 # otherwise orbit the ball until basket is found
                 # y(forward speed) = 0; x and rotation have speed as it turns and moves sideways at the same time when orbiting
                     else:
-                        omni_motion.move(orbit_speed, 0, orbit_speed)
+                        omni_motion.move(orbit_speed*3, 0, orbit_speed)
             
 
             # drive ontop of the ball and throw it.
@@ -180,7 +180,7 @@ def main_loop():
                     state=State.FIND_BALL
                     throw_start=0
                     ball_out_of_frame=False
-                    continue
+
                 
                 elif ball_out_of_frame==True:
                     omni_motion.move(0, -throw_forward_speed, 0, throw_motor_speed)
