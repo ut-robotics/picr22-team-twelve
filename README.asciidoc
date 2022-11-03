@@ -187,3 +187,4 @@ Pille::
 	* Programming - adding referee command listening (30min)
 	* Programming on site - trying to get camera image when remote connection, failed, still have qt5 error. (1h30min)
 	* Programming on site - testing the code, rewriting logic to find basket and orbit the ball. It is now proportional. (2h)
+	* Commenting the code. (30min)
