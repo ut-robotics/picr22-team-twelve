@@ -168,12 +168,12 @@ def main_loop():
                         x_speed_prop=(processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
                     
                     # y-speed (forward speed) is calculated based on the distance of the ball 
-                    y_speed_prop=(400-processedData.balls[-1].distance)/(cam.rgb_height-400)
+                    y_speed_prop=(processedData.balls[-1].distance-400)/(cam.rgb_height-400)
                     # rotational speed is the difference between the desired x-location of the ball and actual, normalized and proportional
                     rot_speed_prop= (ball_desired_x - processedData.balls[-1].x)/cam.rgb_width
                 
                     # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
-                    if -0.05>x_speed_prop>0.05 and -0.05>y_speed_prop>0.05 and y_speed_prop<0.05:
+                    if -0.05>x_speed_prop>0.05 and -0.05>y_speed_prop>0.05 and -0.1<y_speed_prop:
                         state = State.THROW_BALL
                         continue
                     # center the basket and the ball with orbiting, get the ball to the desired distance
