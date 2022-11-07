@@ -100,9 +100,9 @@ def main_loop():
     try:        
         while True:
 
-            while True:
-                omni_motion.move(0, 0, 0, 20)
-                print("testing")
+            #while True:
+                #omni_motion.move(0, 0, 0, 20)
+                #print("testing thrower")
             # method for printing the state only when it changes
             if new_state==True: print(state)
             last_state, new_state =  state_printer(state, last_state, new_state)
@@ -167,9 +167,9 @@ def main_loop():
                 y_speed_prop=(processedData.balls[-1].distance-400)/(cam.rgb_height-400)
                 # rotational speed is the difference between the desired x-location of the ball and actual, normalized and proportional
                 rot_speed_prop= (ball_desired_x - processedData.balls[-1].x)/cam.rgb_width
-            
+                print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
-                if -0.05<x_speed_prop<0.05 and -0.05>y_speed_prop<0.05 and -0.2<y_speed_prop:
+                if -0.05<x_speed_prop<0.05 and -0.05<rot_speed_prop<0.05 and -0.05<y_speed_prop<0.05:
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
@@ -184,25 +184,26 @@ def main_loop():
                         ball_out_of_frame=True
                         throw_start=time.time()
                         print("no balls")
-                    elif processedData.balls[-1].distance<400:
+                    elif processedData.balls[-1].distance<420:
                         ball_out_of_frame=True
                         throw_start=time.time()
                         print("BIG")
 
                 # if the ball is out of frame then the throw duration should be bigger than 1.2
                 throw_duration=time.time()-throw_start
-                if throw_duration>1.2 and ball_out_of_frame==True:
+                if throw_duration>4 and ball_out_of_frame==True:
                     state=State.FIND_BALL
                     throw_start=0
                     ball_out_of_frame=False
                     print("ball out and time out")
+                    continue
 
 
                 if ball_out_of_frame==True:
                     #when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                     y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/cam.rgb_height
                     x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
-                    omni_motion.move(x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed, 0, throw_motor_speed_max)
+                    omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/4, 0, throw_motor_speed_max)
                     print("ball not in view drive")
 
                 # when the ball is in view, drive towards it
