@@ -195,3 +195,7 @@ Stepan:: Rewired the thrower (1h)
 === 05.11
 
 Pille:: Changes to the ball throwing logic code (30min).
+
+=== 07.11
+
+Pille:: On-site testing of the code. Works more or less, percsion is not good. Couldn't test the thrower because it didn't work.
