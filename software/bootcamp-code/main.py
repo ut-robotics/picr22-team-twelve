@@ -72,7 +72,7 @@ def main_loop():
     # Ball desired coordinates are in the middle of the frame width and 83% of frame height
     # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
     ball_desired_x = cam.rgb_width/2
-    ball_desired_y = cam.rgb_height/1.2
+    ball_desired_y = 400
 
     # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
     max_motor_speed = 80
@@ -140,7 +140,7 @@ def main_loop():
                 dest_y = ball_desired_y - processedData.balls[-1].y
               
                 # if ball is close enough, circle it and find a basket (the distance is from the 0 coordinate - closer is larger value)
-                if processedData.balls[-1].distance>400:
+                if processedData.balls[-1].distance>380:
                     state=State.FIND_BASKET
                     continue
                 # else simultaniously drive to and center the ball
@@ -167,9 +167,9 @@ def main_loop():
                 y_speed_prop=(processedData.balls[-1].distance-400)/(cam.rgb_height-400)
                 # rotational speed is the difference between the desired x-location of the ball and actual, normalized and proportional
                 rot_speed_prop= (ball_desired_x - processedData.balls[-1].x)/cam.rgb_width
-                print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
+                #print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
-                if -0.05<x_speed_prop<0.05 and -0.05<rot_speed_prop<0.05 and -0.05<y_speed_prop<0.05:
+                if -0.1<x_speed_prop<0.1 and -0.1<rot_speed_prop<0.1 and -0.1<y_speed_prop<0.1:
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
@@ -183,11 +183,11 @@ def main_loop():
                     if (len(processedData.balls))<1:
                         ball_out_of_frame=True
                         throw_start=time.time()
-                        print("no balls")
-                    elif processedData.balls[-1].distance<420:
+                        print("no balls found")
+                    elif processedData.balls[-1].y<400:
                         ball_out_of_frame=True
                         throw_start=time.time()
-                        print("BIG")
+                        print("BIGgest ball dist<400")
 
                 # if the ball is out of frame then the throw duration should be bigger than 1.2
                 throw_duration=time.time()-throw_start
