@@ -203,11 +203,14 @@ def main_loop():
 
 
                 if ball_out_of_frame==True:
+		    print("ball not in view drive")
                     #when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                     y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/cam.rgb_height
                     x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
-                    omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/4, 0, throw_motor_speed_max)
-                    print("ball not in view drive")
+		    # normalize the basket distance from the robot to the 0-1 range
+                    basket_dist_norm = (basket_max_distance-processedData.basket_b.y)/basket_max_distance
+                    omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/4, 0, throw_motor_speed_max*basket_dist_norm)
+
 
                 # when the ball is in view, drive towards it
                 else:
