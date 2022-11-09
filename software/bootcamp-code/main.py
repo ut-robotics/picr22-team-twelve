@@ -194,51 +194,36 @@ def main_loop():
                         throw_start=time.time()
                         print("BIGgest ball dist<400")
 
-                # if the ball is out of frame then the throw duration should be bigger than 1.2
+                # if the ball is out of frame then the throw duration should be 2.5s
                 throw_duration=time.time()-throw_start
-                if throw_duration>4 and ball_out_of_frame==True:
+                if throw_duration>2.5 and ball_out_of_frame==True:
                     state=State.FIND_BALL
                     throw_start=0
                     ball_out_of_frame=False
                     print("ball out and time out")
                     continue
 
-
+		#TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance. 
+                # Based on that you can either estimate a function or linearly interpolate the speeds.
+		
+		#when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                 if ball_out_of_frame==True:
                     print("ball not in view drive")
-                    #when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
-                    y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/cam.rgb_height
-                    x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
-		    # normalize the basket distance from the robot to the 0-1 range
-                    basket_dist_norm = (processedData.basket_b.distance)/cam.rgb_height
-                    if basket_dist_norm<0: basket_dist_norm=basket_dist_norm*(-1)
-                    thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
-                    omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/4, 0, thrower_speed_prop)
-
-
-                # when the ball is in view, drive towards it
+	            x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
+                # when the ball is in view, drive towards it, x-speed based on ball and basket dif
                 else:
                     print("ball in view drive")
-                    # enters the if statement once to start the throw timer when the ball has just gone out of frame
-                    if (len(processedData.balls))<1:
-                        ball_out_of_frame=True
-                        throw_start=time.time()
-                        continue
-                    elif processedData.balls[-1].distance<(cam.rgb_height-70): # when there are other balls in view but the biggest is very close
-                        ball_out_of_frame=True
-                        throw_start=time.time()
-                        continue
-                    #TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance. 
-                    # Based on that you can either estimate a function or linearly interpolate the speeds.
-                    
-                    # normalize the basket distance from the robot to the 0-1 range
-                    basket_dist_norm = (basket_max_distance-processedData.basket_b.y)/basket_max_distance
-                    # x speed is proportional to the distance of the ball from the basket
+		    # x speed aka side speed is proportional to the distance of the ball from the basket
                     x_speed_prop = (processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
-                    #the max distance of the basket is 100 pixels from out of frame
-                    if basket_dist_norm<0: basket_dist_norm=basket_dist_norm*(-1)
-                    thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
-                    omni_motion.move(x_speed_prop*throw_move_speed, -1*basket_dist_norm*throw_move_speed, 0, thrower_speed_prop)
+		    
+	        # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate
+		y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/(cam.rgb_height-100)
+		# normalize the basket distance
+                basket_dist_norm = (processedData.basket_b.distance)/cam.rgb_height
+                if basket_dist_norm<0: continue # if the basket distance is a negative value, try again
+                else:
+		    thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
+                    omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed, 0, thrower_speed_prop)
                 
             
             elif state==State.STOP:
