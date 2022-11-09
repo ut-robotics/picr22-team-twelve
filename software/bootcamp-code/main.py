@@ -89,7 +89,7 @@ def main_loop():
     # the maximum distance of the ball (y zero coordinate is in the upper edge of the frame)
     basket_max_distance=cam.rgb_height-100
     # maximum speed to throw the ball
-    throw_motor_speed_max=max_motor_speed/8
+    throw_motor_speed_max=2000
     # variable to store target basket color, currently blue for testing
     basket_color="basket_b"
 
@@ -100,9 +100,12 @@ def main_loop():
     try:        
         while True:
 
-            #while True:
-                #omni_motion.move(0, 0, 0, 20)
-                #print("testing thrower")
+            while True:
+                omni_motion.move(0, 0, 0, 800)
+                print("testing thrower")
+                print(processor.process_frame(aligned_depth=False).basket_b.distance)
+		#distance 18 - speed 900
+		# speed 1000 - dist 17, 18
             # method for printing the state only when it changes
             if new_state==True: print(state)
             last_state, new_state =  state_printer(state, last_state, new_state)
