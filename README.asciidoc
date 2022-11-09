@@ -198,4 +198,8 @@ Pille:: Changes to the ball throwing logic code (30min).
 
 === 07.11
 
-Pille:: On-site testing of the code. Works more or less, percsion is not good. Couldn't test the thrower because it didn't work. (1h20min)
+Pille:: On-site testing of the code. Works more or less, precision is not good. Couldn't test the thrower because it didn't work. (1h20min)
+
+=== 09.11
+
+Pille:: Team management, following up with team mates, checking on progress. Discussion whether I try to get the programming ready for tomorrows test competition or not.
