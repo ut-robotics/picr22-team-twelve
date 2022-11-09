@@ -211,8 +211,9 @@ def main_loop():
                     x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
 		    # normalize the basket distance from the robot to the 0-1 range
                     basket_dist_norm = (processedData.basket_b.distance)/cam.rgb_height
-                    thrower_speed_prop=basket_dist_norm*thrower_speed_range+thrower_motor_speed_min
-                    omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/4, 0, throw_motor_speed_max*thrower_speed_prop)
+                    if basket_dist_norm<0: basket_dist_norm=basket_dist_norm*(-1)
+                    thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
+                    omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/4, 0, thrower_speed_prop)
 
 
                 # when the ball is in view, drive towards it
@@ -235,8 +236,9 @@ def main_loop():
                     # x speed is proportional to the distance of the ball from the basket
                     x_speed_prop = (processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
                     #the max distance of the basket is 100 pixels from out of frame
-                    thrower_speed_prop=basket_dist_norm*thrower_speed_range+thrower_motor_speed_min
-                    omni_motion.move(x_speed_prop*throw_move_speed, -1*basket_dist_norm*throw_move_speed, 0, throw_motor_speed_max*thrower_speed_prop)
+                    if basket_dist_norm<0: basket_dist_norm=basket_dist_norm*(-1)
+                    thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
+                    omni_motion.move(x_speed_prop*throw_move_speed, -1*basket_dist_norm*throw_move_speed, 0, thrower_speed_prop)
                 
             
             elif state==State.STOP:
