@@ -100,10 +100,10 @@ def main_loop():
     try:        
         while True:
 
-            while True:
-                omni_motion.move(0, 0, 0, 800)
-                print("testing thrower")
-                print(processor.process_frame(aligned_depth=False).basket_b.distance)
+#            while True:
+#                omni_motion.move(0, 0, 0, 800)
+#                print("testing thrower")
+#                print(processor.process_frame(aligned_depth=False).basket_b.distance)
 		#distance 18 - speed 900
 		# speed 1000 - dist 17, 18
             # method for printing the state only when it changes
@@ -203,12 +203,12 @@ def main_loop():
 
 
                 if ball_out_of_frame==True:
-		    print("ball not in view drive")
+                    print("ball not in view drive")
                     #when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                     y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/cam.rgb_height
                     x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
 		    # normalize the basket distance from the robot to the 0-1 range
-                    basket_dist_norm = (basket_max_distance-processedData.basket_b.y)/basket_max_distance
+                    basket_dist_norm = (processedData.basket_b.distance)/cam.rgb_height
                     omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/4, 0, throw_motor_speed_max*basket_dist_norm)
 
 
