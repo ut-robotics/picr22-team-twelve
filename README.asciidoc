@@ -202,4 +202,6 @@ Pille:: On-site testing of the code. Works more or less, precision is not good. 
 
 === 09.11
 
-Pille:: Team management, following up with team mates, checking on progress. Discussion whether I try to get the programming ready for tomorrows test competition or not.
+Pille:: 
+	* Team management, following up with team mates, checking on progress. Discussion whether I try to get the programming ready for tomorrows test competition or not. (30min)
+	* On-site testing the movement and thrower. (2h)
