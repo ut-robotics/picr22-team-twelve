@@ -209,3 +209,9 @@ Pille::
 === 13.11
 
 Pille:: Progress presentation slides (30min).
+
+=== 14.11
+
+Pille:: 
+	* Testing the throwing logic. Even managed to get some balls in the basket. (1h)
+	* Presentation (1h).
