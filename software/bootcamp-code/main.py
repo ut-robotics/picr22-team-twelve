@@ -154,6 +154,7 @@ def main_loop():
                     # (then the driving is proportional)
                     x_speed = (dest_x/cam.rgb_width) * max_motor_speed
                     y_speed = (dest_y/cam.rgb_height) * max_motor_speed
+                    print(-1*x_speed, -1*y_speed, x_speed)
                     omni_motion.move(-1*x_speed, -1*y_speed, x_speed)
             
             # state to find the basket when ball is found - circle around the ball until basket is found, then move on to throwing
@@ -168,13 +169,13 @@ def main_loop():
                 if processedData.basket_b.exists:
                     x_speed_prop=(processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
                 
-                # y-speed (forward speed) is calculated based on the distance of the ball 
-                y_speed_prop=(processedData.balls[-1].distance-400)/(cam.rgb_height-400)
+                # y-speed (forward speed) is calculated based on the distance of the ball
+                y_speed_prop=(processedData.balls[-1].distance - ball_desired_y)/(cam.rgb_height)
                 # rotational speed is the difference between the desired x-location of the ball and actual, normalized and proportional
                 rot_speed_prop= (ball_desired_x - processedData.balls[-1].x)/cam.rgb_width
-                #print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
+                print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
-                if -0.1<x_speed_prop<0.1 and -0.1<rot_speed_prop<0.1 and -0.1<y_speed_prop<0.1:
+                if -0.07<x_speed_prop<0.07 and -0.05<rot_speed_prop<0.05 and -0.07<y_speed_prop<0.07:
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
@@ -194,9 +195,9 @@ def main_loop():
                         throw_start=time.time()
                         print("BIGgest ball dist<400")
 
-                # if the ball is out of frame then the throw duration should be 2.5s
+                # if the ball is out of frame then the throw duration should be 1.2s
                 throw_duration=time.time()-throw_start
-                if throw_duration>2.5 and ball_out_of_frame==True:
+                if throw_duration>1.2 and ball_out_of_frame==True:
                     state=State.FIND_BALL
                     throw_start=0
                     ball_out_of_frame=False
@@ -209,7 +210,7 @@ def main_loop():
 		#when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                 if ball_out_of_frame==True:
                     print("ball not in view drive")
-	            x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
+                    x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
                 # when the ball is in view, drive towards it, x-speed based on ball and basket dif
                 else:
                     print("ball in view drive")
@@ -217,12 +218,12 @@ def main_loop():
                     x_speed_prop = (processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
 		    
 	        # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate
-		y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/(cam.rgb_height-100)
+                y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/(cam.rgb_height-100)
 		# normalize the basket distance
                 basket_dist_norm = (processedData.basket_b.distance)/cam.rgb_height
                 if basket_dist_norm<0: continue # if the basket distance is a negative value, try again
                 else:
-		    thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
+                    thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
                     omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed, 0, thrower_speed_prop)
                 
             
