@@ -215,3 +215,8 @@ Pille:: Progress presentation slides (30min).
 Pille:: 
 	* Testing the throwing logic. Even managed to get some balls in the basket. (1h)
 	* Presentation (1h).
+	
+=== 16.11
+
+Kenno:: 
+	* Wheel design. (2h)	
