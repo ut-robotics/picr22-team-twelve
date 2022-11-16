@@ -220,3 +220,4 @@ Pille::
 
 Kenno:: 
 	* Wheel design. (2h)	
+	* Motor mount design. (30min)	
