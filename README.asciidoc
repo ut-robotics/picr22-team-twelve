@@ -233,5 +233,5 @@ Pille::
 	* Adding basket depth calculations. (30min)
 
 Kenno:: 
-	' Robot issues, design help and fixes. (1h30min)
-	' Brainstorming ideas for the camera mount. (30min)
+	* Robot issues, design help and fixes. (1h30min)
+	* Brainstorming ideas for the camera mount. (30min)
