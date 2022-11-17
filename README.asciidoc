@@ -188,6 +188,7 @@ Pille::
 	* Programming on site - trying to get camera image when remote connection, failed, still have qt5 error. (1h30min)
 	* Programming on site - testing the code, rewriting logic to find basket and orbit the ball. It is now proportional. (2h)
 	* Commenting the code. (30min)
+
 === 04.11
 
 Stepan:: Rewired the thrower (1h)
@@ -225,5 +226,9 @@ Kenno::
 
 === 17.11
 
-Pille:: Editing the code, making changes requested in the code review. (1h45min)
+Pille:: 
+	* Editing the code, making changes requested in the code review. (1h45min)
+	* On-site: fixing the wheel, then fixing the thrower connection. (1h)
+	* On-site: adjusting code to throw the ball more precisely. (1h30min)
+
 Kenno:: Robot issues, design help and fixes. (1h30min)
