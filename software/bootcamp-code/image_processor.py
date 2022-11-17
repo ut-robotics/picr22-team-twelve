@@ -26,7 +26,9 @@ kernel=np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]], dtype=np.uint8)
 class ProcessedResults():
 
     def __init__(self, 
-                balls=[], 
+                balls=[],
+                balls_exist=False,
+                biggest_ball=Object(exists = False),
                 basket_b = Object(exists = False), 
                 basket_m = Object(exists = False), 
                 color_frame = [],
@@ -36,6 +38,8 @@ class ProcessedResults():
 
 
         self.balls = balls
+        self.balls_exist = balls_exist
+        self.biggest_ball = biggest_ball
         self.basket_b = basket_b
         self.basket_m = basket_m
         self.color_frame = color_frame
@@ -101,8 +105,8 @@ class ImageProcessor():
             obj_y = int(y + (h/2))
             obj_dst = obj_y
             
-            # if the object found is in the upper fifth of the image, don't consider it as a ball
-            if obj_y<(self.camera.rgb_height/5):
+            # if the object found is in the upper sixth of the image, don't consider it as a ball
+            if obj_y<(self.camera.rgb_height/6):
                 continue
 
             if self.debug:
@@ -112,8 +116,12 @@ class ImageProcessor():
             balls.append(Object(x = obj_x, y = obj_y, size = size, distance = obj_dst, exists = True))
 
         balls.sort(key= lambda x: x.distance)
-
-        return balls
+        
+        biggest_ball = Object(exists=False)
+        if len(balls)>0:
+            biggest_ball = balls[-1]
+            
+        return balls, biggest_ball
 
     def analyze_baskets(self, t_basket, debug_color = (0, 255, 255)) -> list:
         contours, hierarchy = cv2.findContours(t_basket, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -160,11 +168,15 @@ class ImageProcessor():
         if self.debug:
             self.debug_frame = np.copy(color_frame)
 
-        balls = self.analyze_balls(self.t_balls, self.fragmented)
+        balls, biggest_ball = self.analyze_balls(self.t_balls, self.fragmented)
         basket_b = self.analyze_baskets(self.t_basket_b, debug_color=c.Color.BLUE.color.tolist())
         basket_m = self.analyze_baskets(self.t_basket_m, debug_color=c.Color.MAGENTA.color.tolist())
+        if len(balls)>0: balls_exist=True
+        else: balls_exist=False
 
-        return ProcessedResults(balls = balls, 
+        return ProcessedResults(balls = balls,
+                                balls_exist = balls_exist,
+                                biggest_ball = biggest_ball,
                                 basket_b = basket_b, 
                                 basket_m = basket_m, 
                                 color_frame=color_frame, 
