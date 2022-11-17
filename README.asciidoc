@@ -220,4 +220,8 @@ Pille::
 
 Kenno:: 
 	* Wheel design. (2h)	
-	* Motor mount design. (30min)	
+	* Motor mount design. (30min)
+
+=== 17.11
+
+Pille:: Editing the code, making changes requested in the code review. (1h15min)
