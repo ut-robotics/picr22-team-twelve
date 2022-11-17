@@ -8,11 +8,19 @@ import asyncio #for referee commands over websockets
 import websockets #before use: pip3.9 install websockets
 import json #for parsing referee commands into python library
 
-"""async def listen_referee(command_list):
+# method for listening to referee commands
+async def listen_referee(command_list):
     async with websockets.connect('ws://localhost:8008') as websocket:
         command = await websocket.recv()
         command_list.append(command)
-"""
+
+# function to renew the referee command list
+def get_referee_commands(command_list):
+    # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
+    referee=json.loads(command_list[0])
+    if referee["signal"] == "start": return State.FIND_BALL
+    else: return State.STOP
+
 # STATE MACHINE: 
 class State(Enum):
     FIND_BALL = 0
@@ -39,8 +47,15 @@ def norm_co(desired_location, coordinate, max_range):
 	return speed
 	
 def main_loop():
+    # state to show camera image
     debug = False
-    
+    # state if to listen to referee commands, when competition, change to True
+    referee_active=False
+    # if want to test the thrower, change to True
+    test_thrower=False
+    # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
+    basket_blue=True
+
     #motion_sim = motion.TurtleRobot()
     #motion_sim2 = motion.TurtleOmniRobot()
 
@@ -60,13 +75,9 @@ def main_loop():
     # open the serial connection
     omni_motion.open()
     
+    # list for referee commands
     command_list=[]
-    # listen for referee commands
-    #asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
-    # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
-    #referee=json.loads(command_list[0])
-    #if referee["signal"] == "start": state=State.FIND_BALL
-    #else: state=State.STOP
+    # default state to start with
     state=State.FIND_BALL
 
     start = time.time()
@@ -99,8 +110,7 @@ def main_loop():
     throw_motor_speed_max=2040
     throw_motor_speed_min=800
     thrower_speed_range=throw_motor_speed_max-throw_motor_speed_min
-    # variable to store target basket color, currently blue for testing
-    basket_color="basket_b"
+
 
     # for printing logs (log when change state)
     new_state=True
@@ -109,22 +119,29 @@ def main_loop():
     try:        
         while True:
 	
-	# set the basket color to which we want to throw into
-	basket_to_throw = processedData.basket_m
-	if basket_color=="basket_b":
-		basket_to_throw=processedData.basket_b
-		
-#            while True:
-#                omni_motion.move(0, 0, 0, 800)
-#                print("testing thrower")
-#                print(processor.process_frame(aligned_depth=False).basket_b.distance)
-		#distance 18 - speed 900
-		# speed 1000 - dist 17, 18
+	    # get the referee command
+	    if referee_active:
+	        # listen for referee commands
+	        asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
+    	        state=get_referee_commands(command_list)
+
+	    # to test the thrower	
+            while test_thrower:
+                omni_motion.move(0, 0, 0, 800)
+                print("testing thrower")
+                print(processor.process_frame(aligned_depth=False).basket_b.distance)
+
             # method for printing the state only when it changes
             if new_state==True: print(state)
             last_state, new_state =  state_printer(state, last_state, new_state)
-            # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
+            
+	    # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
+	
+	    # set the basket color to which we want to throw into
+	    basket_to_throw = processedData.basket_b
+	    if basket_blue==False:
+		basket_to_throw=processedData.basket_m
             
             # Here is the state machine for the driving logic.
                 #Omni-motion movement:
@@ -140,7 +157,6 @@ def main_loop():
                     state=State.MOVE_CENTER_BALL
                     continue
                 # if no ball found, rotate
-                
                 omni_motion.move(0, 0, find_rotation_speed)
 
             # STATE TO MOVE TO AND CENTER THE BALL
