@@ -52,7 +52,7 @@ def main_loop():
     # state if to listen to referee commands, when competition, change to True
     referee_active = False
     # if want to test the thrower, change to True
-    test_thrower = False
+    test_thrower = True
     # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
     basket_blue = True
 
@@ -98,7 +98,7 @@ def main_loop():
     # rotation speed for find ball state
     find_rotation_speed = max_motor_speed/6
     # orbiting speed for centering the basket
-    orbit_speed = max_motor_speed/1.5
+    orbit_speed = max_motor_speed/3
 
     # start time variable for thrower state
     throw_start=0
@@ -127,7 +127,7 @@ def main_loop():
 
             # to test the thrower
             while test_thrower==True:
-                omni_motion.move(0, 0, 0, 800)
+                omni_motion.move(0, 0, 0, 1200)
                 print("testing thrower")
                 print(processor.process_frame(aligned_depth=False).basket_b.distance)
 
@@ -186,9 +186,9 @@ def main_loop():
                     continue
                     
                 #x-speed (side speed) is the proportional speed of the normalised difference between ball x coordinate and basket x coordinate
-                x_speed_prop = -1*norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
-                if processedData.basket_to_throw.exists:
-                    x_speed_prop = norm_co(processedData.biggest_ball.x, processedData.basket_to_throw.x, cam.rgb_width)
+                x_speed_prop = -1*norm_co(processedData.biggest_ball.x, 0, cam.rgb_width)
+                if basket_to_throw.exists:
+                    x_speed_prop = -1*norm_co(basket_to_throw.x, processedData.biggest_ball.x, cam.rgb_width)
                 
                 # y-speed (forward speed) is calculated based on the distance of the ball
                 y_speed_prop = -1*norm_co(ball_desired_y, processedData.biggest_ball.distance, cam.rgb_height)
@@ -196,7 +196,7 @@ def main_loop():
                 rot_speed_prop = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
                 #print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
-                if -0.07<x_speed_prop<0.07 and -0.05<rot_speed_prop<0.05 and -0.07<y_speed_prop<0.07:
+                if -0.07<x_speed_prop<0.07 and -0.05<rot_speed_prop<0.05 and -0.07<y_speed_prop<0.07 and basket_to_throw.exists:
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
@@ -237,7 +237,7 @@ def main_loop():
                 # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate -destination is 100pixels from the bottom edge
                 y_speed_prop=norm_co((cam.rgb_height-100), basket_to_throw.y, (cam.rgb_height-100))
                 # normalize the basket distance
-                basket_dist_norm = (processedData.basket_to_throw.distance)/cam.rgb_height
+                basket_dist_norm = (basket_to_throw.distance)/cam.rgb_height
                 if basket_dist_norm<0: continue # if the basket distance is a negative value, try again (bad values handling)
                 else:
                     thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
