@@ -224,4 +224,4 @@ Kenno::
 
 === 17.11
 
-Pille:: Editing the code, making changes requested in the code review. (1h15min)
+Pille:: Editing the code, making changes requested in the code review. (1h45min)
