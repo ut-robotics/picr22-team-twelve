@@ -52,7 +52,7 @@ def main_loop():
     # state if to listen to referee commands, when competition, change to True
     referee_active = False
     # if want to test the thrower, change to True
-    test_thrower = True
+    test_thrower = False
     # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
     basket_blue = True
 
