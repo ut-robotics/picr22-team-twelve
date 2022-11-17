@@ -123,7 +123,8 @@ def main_loop():
             # STATE TO FIND THE BALL
             if state == State.FIND_BALL:
                 # if we have a ball in view, center it
-                if len(processedData.balls)>0:
+                #if len(processedData.balls)>0:
+		if processedData.balls_exist==True:
                     state=State.MOVE_CENTER_BALL
                     continue
                 # if no ball found, rotate
@@ -133,7 +134,8 @@ def main_loop():
             # STATE TO MOVE TO AND CENTER THE BALL
             elif state == State.MOVE_CENTER_BALL:
                 # if there are no balls, then find one
-                if len(processedData.balls)<1:
+                #if len(processedData.balls)<1:
+		if processedData.balls_exist==False:
                     state=State.FIND_BALL
                     continue
                     
@@ -141,11 +143,11 @@ def main_loop():
                 # Using the coordinates of the biggest ball calculate the side speed, forward speed and rotation for the robot.
                 
                 # The destination coordinates are the difference between the ball location and desired location.
-                dest_x = ball_desired_x - processedData.balls[-1].x
-                dest_y = ball_desired_y - processedData.balls[-1].y
+                dest_x = ball_desired_x - processedData.biggest_ball.x
+                dest_y = ball_desired_y - processedData.biggest_ball.y
               
                 # if ball is close enough, circle it and find a basket (the distance is from the 0 coordinate - closer is larger value)
-                if processedData.balls[-1].distance>380:
+                if processedData.biggest_ball.distance>380:
                     state=State.FIND_BASKET
                     continue
                 # else simultaniously drive to and center the ball
@@ -160,19 +162,19 @@ def main_loop():
             # state to find the basket when ball is found - circle around the ball until basket is found, then move on to throwing
             elif state==State.FIND_BASKET:
                 # if there are no balls, then find one
-                if len(processedData.balls)<1:
+                if processedData.balls_exist==False:
                     state=State.FIND_BALL
                     continue
                     
                 #x-speed (side speed) is the proportional speed of the normalised difference between ball x coordinate and basket x coordinate
-                x_speed_prop = (processedData.balls[-1].x - 0) / cam.rgb_width
+                x_speed_prop = (processedData.biggest_ball.x - 0) / cam.rgb_width
                 if processedData.basket_b.exists:
-                    x_speed_prop=(processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
+                    x_speed_prop=(processedData.biggest_ball.x-processedData.basket_b.x)/cam.rgb_width
                 
                 # y-speed (forward speed) is calculated based on the distance of the ball
-                y_speed_prop=(processedData.balls[-1].distance - ball_desired_y)/(cam.rgb_height)
+                y_speed_prop=(processedData.biggest_ball.distance - ball_desired_y)/(cam.rgb_height)
                 # rotational speed is the difference between the desired x-location of the ball and actual, normalized and proportional
-                rot_speed_prop= (ball_desired_x - processedData.balls[-1].x)/cam.rgb_width
+                rot_speed_prop= (ball_desired_x - processedData.biggest_ball.x)/cam.rgb_width
                 print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
                 if -0.07<x_speed_prop<0.07 and -0.05<rot_speed_prop<0.05 and -0.07<y_speed_prop<0.07:
@@ -186,14 +188,14 @@ def main_loop():
             elif state==State.THROW_BALL:              
                 # enters the if statement once to start the throw timer when the ball is out of frame
                 if ball_out_of_frame==False:
-                    if (len(processedData.balls))<1:
+                    if processedData.balls_exist==False:
                         ball_out_of_frame=True
                         throw_start=time.time()
                         print("no balls found")
-                    elif processedData.balls[-1].y<400:
-                        ball_out_of_frame=True
-                        throw_start=time.time()
-                        print("BIGgest ball dist<400")
+                    #elif processedData.biggest_ball.y<400:
+                     #   ball_out_of_frame=True
+                      #  throw_start=time.time()
+                       # print("BIGgest ball dist<400")
 
                 # if the ball is out of frame then the throw duration should be 1.2s
                 throw_duration=time.time()-throw_start
@@ -215,7 +217,7 @@ def main_loop():
                 else:
                     print("ball in view drive")
 		    # x speed aka side speed is proportional to the distance of the ball from the basket
-                    x_speed_prop = (processedData.balls[-1].x-processedData.basket_b.x)/cam.rgb_width
+                    x_speed_prop = (processedData.biggest_ball.x-processedData.basket_b.x)/cam.rgb_width
 		    
 	        # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate
                 y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/(cam.rgb_height-100)
