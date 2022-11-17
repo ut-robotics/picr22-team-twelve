@@ -43,18 +43,18 @@ def state_printer(state, last_state, new_state):
 # (then the driving is proportional)
 # The destination coordinates are the difference between the ball location and desired location.
 def norm_co(desired_location, coordinate, max_range):
-	speed = (desired_location - coordinate)/max_range
-	return speed
+    speed = (desired_location - coordinate)/max_range
+    return speed
 	
 def main_loop():
     # state to show camera image
     debug = False
     # state if to listen to referee commands, when competition, change to True
-    referee_active=False
+    referee_active = False
     # if want to test the thrower, change to True
-    test_thrower=False
+    test_thrower = False
     # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
-    basket_blue=True
+    basket_blue = True
 
     #motion_sim = motion.TurtleRobot()
     #motion_sim2 = motion.TurtleOmniRobot()
@@ -119,14 +119,14 @@ def main_loop():
     try:        
         while True:
 	
-	    # get the referee command
-	    if referee_active:
-	        # listen for referee commands
-	        asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
-    	        state=get_referee_commands(command_list)
+            # get the referee command
+            if referee_active:
+                # listen for referee commands
+                asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
+                state=get_referee_commands(command_list)
 
-	    # to test the thrower	
-            while test_thrower:
+            # to test the thrower
+            while test_thrower==True:
                 omni_motion.move(0, 0, 0, 800)
                 print("testing thrower")
                 print(processor.process_frame(aligned_depth=False).basket_b.distance)
@@ -135,25 +135,24 @@ def main_loop():
             if new_state==True: print(state)
             last_state, new_state =  state_printer(state, last_state, new_state)
             
-	    # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
+            # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
             processedData = processor.process_frame(aligned_depth=False)
 	
-	    # set the basket color to which we want to throw into
-	    basket_to_throw = processedData.basket_b
-	    if basket_blue==False:
-		basket_to_throw=processedData.basket_m
-            
+            # set the basket color to which we want to throw into
+            basket_to_throw = processedData.basket_b
+            if basket_blue==False: basket_to_throw=processedData.basket_m
+
             # Here is the state machine for the driving logic.
-                #Omni-motion movement:
-                # side speed is x_speed
-                # forward speed is y_speed
-                # rotation if you want to turn
+            #   Omni-motion movement:
+            #   side speed is x_speed
+            #   forward speed is y_speed
+            #   rotation if you want to turn
             
             # STATE TO FIND THE BALL
             if state == State.FIND_BALL:
                 # if we have a ball in view, center it
                 #if len(processedData.balls)>0:
-		if processedData.balls_exist==True:
+                if processedData.balls_exist==True:
                     state=State.MOVE_CENTER_BALL
                     continue
                 # if no ball found, rotate
@@ -163,7 +162,7 @@ def main_loop():
             elif state == State.MOVE_CENTER_BALL:
                 # if there are no balls, then find one
                 #if len(processedData.balls)<1:
-		if processedData.balls_exist==False:
+                if processedData.balls_exist==False:
                     state=State.FIND_BALL
                     continue
                 
@@ -205,7 +204,7 @@ def main_loop():
 
 
             # drive ontop of the ball and throw it.
-	    # TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance. 
+	        # TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance.
             # Based on that you can either estimate a function or linearly interpolate the speeds.
             elif state==State.THROW_BALL:
 
@@ -224,20 +223,20 @@ def main_loop():
                     print("ball throwing time up")
                     continue
 		
-		#when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
+                #when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                 if ball_out_of_frame==True:
                     print("ball out of frame, calculate side-speed prop to basket x location")
                     x_speed_prop = norm_co(ball_desired_x, basket_to_throw.x, cam.rgb_width)
                 # when the ball is in view, drive towards it, x-speed based on ball and basket x-coordinate difference
                 else:
                     print("ball in viewm, calculate side-speed prop. to basket and ball x location difference")
-		    # x speed aka side speed is proportional to the distance of the ball from the basket
-		    # TODO: are they maybe in the wrong order? basket and then ball?
+                    # x speed aka side speed is proportional to the distance of the ball from the basket
+		            # TODO: are they maybe in the wrong order? basket and then ball?
                     x_speed_prop = norm_co(processedData.biggest_ball.x, basket_to_throw.x, cam.rgb_width)
 		    
-	        # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate -destination is 100pixels from the bottom edge
+                # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate -destination is 100pixels from the bottom edge
                 y_speed_prop=norm_co((cam.rgb_height-100), basket_to_throw.y, (cam.rgb_height-100))
-		# normalize the basket distance
+                # normalize the basket distance
                 basket_dist_norm = (processedData.basket_to_throw.distance)/cam.rgb_height
                 if basket_dist_norm<0: continue # if the basket distance is a negative value, try again (bad values handling)
                 else:
