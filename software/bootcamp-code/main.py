@@ -12,12 +12,12 @@ import json #for parsing referee commands into python library
 async def listen_referee(command_list):
     async with websockets.connect('ws://localhost:8008') as websocket:
         command = await websocket.recv()
-        command_list.append(command)
+        command_list.append(command) #adds to the end of the list
 
-# function to renew the referee command list
+# function to get the latest referee command
 def get_referee_commands(command_list):
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
-    referee=json.loads(command_list[0])
+    referee=json.loads(command_list[-1])
     if referee["signal"] == "start": return State.FIND_BALL
     else: return State.STOP
 
@@ -43,9 +43,21 @@ def state_printer(state, last_state, new_state):
 # (then the driving is proportional)
 # The destination coordinates are the difference between the ball location and desired location.
 def norm_co(desired_location, coordinate, max_range):
-    speed = (desired_location - coordinate)/max_range
-    return speed
-	
+    proportional = (desired_location - coordinate)/max_range
+    return proportional
+
+# method for getting the medium depth of the object in the x, y coordinate in 5x3 area around the location
+def get_depth(depth_frame, x, y):
+    center_px=depth_frame[x][y]
+    counter=0
+    sum=0
+    # 5x3 matrix
+    for x_m in range(x-2, x+2):
+        for y_m in range(y-1, y+1):
+            counter+=1
+            sum+=depth_frame[x_m][y_m]
+    return sum/counter
+
 def main_loop():
     # state to show camera image
     debug = False
@@ -77,6 +89,9 @@ def main_loop():
     
     # list for referee commands
     command_list=[]
+    if referee_active:
+        # listen for referee commands if the referee is active
+        asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
     # default state to start with
     state=State.FIND_BALL
 
@@ -96,21 +111,22 @@ def main_loop():
     # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
     max_motor_speed = 80
     # rotation speed for find ball state
-    find_rotation_speed = max_motor_speed/6
+    find_rotation_speed = max_motor_speed/5
     # orbiting speed for centering the basket
-    orbit_speed = max_motor_speed/2
+    orbit_speed = max_motor_speed
 
     # start time variable for thrower state
     throw_start=0
     # true false variable to keep track if when throwing, the ball has left the camera frame
     ball_out_of_frame=False
     # when throwing the ball, the speed which the robot moves forward
-    throw_move_speed=max_motor_speed/4
+    throw_move_speed=max_motor_speed/2
     # maximum and minimum speed to throw the ball
     throw_motor_speed_max=2040
     throw_motor_speed_min=1000
     thrower_speed_range=throw_motor_speed_max-throw_motor_speed_min
-
+    # maximum basket distance in m
+    max_basket_diepth=3
 
     # for printing logs (log when change state)
     new_state=True
@@ -122,7 +138,7 @@ def main_loop():
             # get the referee command
             if referee_active:
                 # listen for referee commands
-                asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
+                # ayncio.get_event_loop().run_until_complete(listen_referee(command_list))
                 state=get_referee_commands(command_list)
 
             # to test the thrower
@@ -196,18 +212,20 @@ def main_loop():
                 rot_speed_prop = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
                 #print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
-                if -0.08<x_speed_prop<0.08 and -0.08<rot_speed_prop<0.08 and -0.1<y_speed_prop<0.1 and basket_to_throw.exists:
+                if -0.1<x_speed_prop<0.1 and -0.1<rot_speed_prop<0.1 and -0.1<y_speed_prop<0.1 and basket_to_throw.exists:
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
-                omni_motion.move(x_speed_prop, orbit_speed*y_speed_prop, orbit_speed*rot_speed_prop)
+                omni_motion.move(x_speed_prop, orbit_speed*y_speed_prop, orbit_speed*rot_speed_prop/2.5)
 
 
             # drive ontop of the ball and throw it.
 	        # TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance.
             # Based on that you can either estimate a function or linearly interpolate the speeds.
             elif state==State.THROW_BALL:
-
+		# take depth frame basket x, y depth, better to take matrix of all the nearest and the medium of that
+                basket_depth = get_depth(processedData.depth_frame, basket_to_throw.x, basket_to_throw.y)
+		print("BASKET_DEPTH:", basket_depth)
                 # enters the if statement once to start the throw timer when the ball is out of frame
                 if ball_out_of_frame==False and (processedData.balls_exist==False or processedData.biggest_ball.y>450):
                     ball_out_of_frame=True
@@ -225,36 +243,37 @@ def main_loop():
 		
                 #when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                 if ball_out_of_frame==True:
-                    print("ball out of frame, calculate side-speed prop to basket x location")
+                    #print("ball out of frame, calculate side-speed prop to basket x location")
                     x_speed_prop = norm_co(ball_desired_x, basket_to_throw.x, cam.rgb_width)
                     rot_speed_prop = 0
 
                 # when the ball is in view, drive towards it, x-speed based on ball and basket x-coordinate difference
                 else:
-                    print("ball in view, calculate side-speed prop. to basket and ball x location difference")
+                    #print("ball in view, calculate side-speed prop. to basket and ball x location difference")
                     # x speed aka side speed is proportional to the distance of the ball from the basket
-		            # TODO: are they maybe in the wrong order? basket and then ball?
-                    x_speed_prop = norm_co(processedData.biggest_ball.x, basket_to_throw.x, cam.rgb_width/2)
+                    x_speed_prop = norm_co(processedData.biggest_ball.x, basket_to_throw.x, cam.rgb_width) # ? siin oli width/2
                     rot_speed_prop = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
 
 		    
                 # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate -destination is 100pixels from the bottom edge
                 y_speed_prop=norm_co((cam.rgb_height-100), basket_to_throw.y, (cam.rgb_height-100))
-#                y_speed_prop=0
                 # normalize the basket distance
-                # take depth frame basket x, y depth, better to take matrix of all the nearest and the medium of that
-                basket_dist_norm = (basket_to_throw.distance)/cam.rgb_height
-                if basket_dist_norm<0: thrower_speed_prop=0 # if the basket distance is a negative value, try again (bad values handling)
-                else: thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
-                omni_motion.move(-1*x_speed_prop*throw_move_speed*2, -1*y_speed_prop*throw_move_speed, rot_speed_prop*throw_move_speed*2, thrower_speed_prop)
+
+                #basket_dist_norm = (basket_to_throw.distance)/cam.rgb_height
+		basket_dist_norm = norm_co(max_basket_depth - basket_depth)/max_basket_depth
+		thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
+		
+                #if basket_dist_norm<0: thrower_speed_prop=0 # if the basket distance is a negative value, try again (bad values handling)
+                #else: thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
+                omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/2, rot_speed_prop*throw_move_speed, thrower_speed_prop)
                 
             elif state==State.STOP:
                 omni_motion.move(0, 0, 0)
                 
 
-            # Mainboard and communication testing function.
+            """# Mainboard and communication testing function.
             # Move two wheels for 4s. Starting from program start time (zero_time) and duration 0 to 4.
-            # omni_motion.test_moving(zero_time, 0, 4, 0, -15, 15)
+            omni_motion.test_moving(zero_time, 0, 4, 0, -15, 15)"""
 
             frame_cnt +=1
 
