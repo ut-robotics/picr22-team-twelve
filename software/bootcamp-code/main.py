@@ -30,6 +30,14 @@ def state_printer(state, last_state, new_state):
         new_state = True
     return last_state, new_state
 
+# method for normalizing object x or y coordinate
+# Normalize destination in the [-1;1] range and and then multiply it with motor max speed.
+# (then the driving is proportional)
+# The destination coordinates are the difference between the ball location and desired location.
+def norm_co(desired_location, coordinate, max_range):
+	speed = (desired_location - coordinate)/max_range
+	return speed
+	
 def main_loop():
     debug = False
     
@@ -80,15 +88,14 @@ def main_loop():
     find_rotation_speed = max_motor_speed/6
     # orbiting speed for centering the basket
     orbit_speed = max_motor_speed/1.5
+
     # start time variable for thrower state
     throw_start=0
     # true false variable to keep track if when throwing, the ball has left the camera frame
     ball_out_of_frame=False
     # when throwing the ball, the speed which the robot moves forward
     throw_move_speed=max_motor_speed/2
-    # the maximum distance of the ball (y zero coordinate is in the upper edge of the frame)
-    basket_max_distance=cam.rgb_height-100
-    # maximum speed to throw the ball
+    # maximum and minimum speed to throw the ball
     throw_motor_speed_max=2040
     throw_motor_speed_min=800
     thrower_speed_range=throw_motor_speed_max-throw_motor_speed_min
@@ -101,7 +108,12 @@ def main_loop():
     
     try:        
         while True:
-
+	
+	# set the basket color to which we want to throw into
+	basket_to_throw = processedData.basket_m
+	if basket_color=="basket_b":
+		basket_to_throw=processedData.basket_b
+		
 #            while True:
 #                omni_motion.move(0, 0, 0, 800)
 #                print("testing thrower")
@@ -138,25 +150,17 @@ def main_loop():
 		if processedData.balls_exist==False:
                     state=State.FIND_BALL
                     continue
-                    
-                # The biggest ball is the last one in the detected balls list.
-                # Using the coordinates of the biggest ball calculate the side speed, forward speed and rotation for the robot.
                 
-                # The destination coordinates are the difference between the ball location and desired location.
-                dest_x = ball_desired_x - processedData.biggest_ball.x
-                dest_y = ball_desired_y - processedData.biggest_ball.y
-              
                 # if ball is close enough, circle it and find a basket (the distance is from the 0 coordinate - closer is larger value)
                 if processedData.biggest_ball.distance>380:
                     state=State.FIND_BASKET
                     continue
                 # else simultaniously drive to and center the ball
                 else:
-                    # Normalize destination in the [-1;1] range and and then multiply it with motor max speed.
-                    # (then the driving is proportional)
-                    x_speed = (dest_x/cam.rgb_width) * max_motor_speed
-                    y_speed = (dest_y/cam.rgb_height) * max_motor_speed
-                    print(-1*x_speed, -1*y_speed, x_speed)
+                    # Using the coordinates of the biggest ball calculate the side speed, forward speed and rotation for the robot.
+                    x_speed = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width) * max_motor_speed
+                    y_speed = norm_co(ball_desired_y, processedData.biggest_ball.y, cam.rgb_height) * max_motor_speed
+                    #print(-1*x_speed, -1*y_speed, x_speed)
                     omni_motion.move(-1*x_speed, -1*y_speed, x_speed)
             
             # state to find the basket when ball is found - circle around the ball until basket is found, then move on to throwing
@@ -167,15 +171,15 @@ def main_loop():
                     continue
                     
                 #x-speed (side speed) is the proportional speed of the normalised difference between ball x coordinate and basket x coordinate
-                x_speed_prop = (processedData.biggest_ball.x - 0) / cam.rgb_width
-                if processedData.basket_b.exists:
-                    x_speed_prop=(processedData.biggest_ball.x-processedData.basket_b.x)/cam.rgb_width
+                x_speed_prop = -1*norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
+                if processedData.basket_to_throw.exists:
+                    x_speed_prop = norm_co(processedData.biggest_ball.x, processedData.basket_to_throw.x, cam.rgb_width)
                 
                 # y-speed (forward speed) is calculated based on the distance of the ball
-                y_speed_prop=(processedData.biggest_ball.distance - ball_desired_y)/(cam.rgb_height)
+                y_speed_prop = -1*norm_co(ball_desired_y, processedData.biggest_ball.distance, cam.rgb_height)
                 # rotational speed is the difference between the desired x-location of the ball and actual, normalized and proportional
-                rot_speed_prop= (ball_desired_x - processedData.biggest_ball.x)/cam.rgb_width
-                print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
+                rot_speed_prop = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
+                #print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
                 if -0.07<x_speed_prop<0.07 and -0.05<rot_speed_prop<0.05 and -0.07<y_speed_prop<0.07:
                     state = State.THROW_BALL
@@ -185,17 +189,15 @@ def main_loop():
 
 
             # drive ontop of the ball and throw it.
-            elif state==State.THROW_BALL:              
+	    # TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance. 
+            # Based on that you can either estimate a function or linearly interpolate the speeds.
+            elif state==State.THROW_BALL:
+
                 # enters the if statement once to start the throw timer when the ball is out of frame
-                if ball_out_of_frame==False:
-                    if processedData.balls_exist==False:
-                        ball_out_of_frame=True
-                        throw_start=time.time()
-                        print("no balls found")
-                    #elif processedData.biggest_ball.y<400:
-                     #   ball_out_of_frame=True
-                      #  throw_start=time.time()
-                       # print("BIGgest ball dist<400")
+                if ball_out_of_frame==False and processedData.balls_exist==False:
+                    ball_out_of_frame=True
+                    throw_start=time.time()
+                    print("Starting the throw timer")
 
                 # if the ball is out of frame then the throw duration should be 1.2s
                 throw_duration=time.time()-throw_start
@@ -203,32 +205,29 @@ def main_loop():
                     state=State.FIND_BALL
                     throw_start=0
                     ball_out_of_frame=False
-                    print("ball out and time out")
+                    print("ball throwing time up")
                     continue
-
-		#TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance. 
-                # Based on that you can either estimate a function or linearly interpolate the speeds.
 		
 		#when the ball is not in view, calculate proportional speed for the thrower and forward speed based on basket
                 if ball_out_of_frame==True:
-                    print("ball not in view drive")
-                    x_speed_prop=(cam.rgb_width/2 - processedData.basket_b.x)/cam.rgb_width
-                # when the ball is in view, drive towards it, x-speed based on ball and basket dif
+                    print("ball out of frame, calculate side-speed prop to basket x location")
+                    x_speed_prop = norm_co(ball_desired_x, basket_to_throw.x, cam.rgb_width)
+                # when the ball is in view, drive towards it, x-speed based on ball and basket x-coordinate difference
                 else:
-                    print("ball in view drive")
+                    print("ball in viewm, calculate side-speed prop. to basket and ball x location difference")
 		    # x speed aka side speed is proportional to the distance of the ball from the basket
-                    x_speed_prop = (processedData.biggest_ball.x-processedData.basket_b.x)/cam.rgb_width
+		    # TODO: are they maybe in the wrong order? basket and then ball?
+                    x_speed_prop = norm_co(processedData.biggest_ball.x, basket_to_throw.x, cam.rgb_width)
 		    
-	        # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate
-                y_speed_prop=((cam.rgb_height-100)-processedData.basket_b.y)/(cam.rgb_height-100)
+	        # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate -destination is 100pixels from the bottom edge
+                y_speed_prop=norm_co((cam.rgb_height-100), basket_to_throw.y, (cam.rgb_height-100))
 		# normalize the basket distance
-                basket_dist_norm = (processedData.basket_b.distance)/cam.rgb_height
-                if basket_dist_norm<0: continue # if the basket distance is a negative value, try again
+                basket_dist_norm = (processedData.basket_to_throw.distance)/cam.rgb_height
+                if basket_dist_norm<0: continue # if the basket distance is a negative value, try again (bad values handling)
                 else:
                     thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
                     omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed, 0, thrower_speed_prop)
                 
-            
             elif state==State.STOP:
                 omni_motion.move(0, 0, 0)
                 
