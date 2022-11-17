@@ -232,4 +232,6 @@ Pille::
 	* On-site: adjusting code to throw the ball more precisely. (1h30min)
 	* Adding basket depth calculations. (30min)
 
-Kenno:: Robot issues, design help and fixes. (1h30min)
+Kenno:: 
+	' Robot issues, design help and fixes. (1h30min)
+	' Brainstorming ideas for the camera mount. (30min)
