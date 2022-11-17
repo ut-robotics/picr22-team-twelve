@@ -221,7 +221,9 @@ Pille::
 Kenno:: 
 	* Wheel design. (2h)	
 	* Motor mount design. (30min)
+	* Fixing issues that were pointed out during the review. (30min)
 
 === 17.11
 
 Pille:: Editing the code, making changes requested in the code review. (1h45min)
+Kenno:: Robot issues, design help and fixes. (1h30min)
