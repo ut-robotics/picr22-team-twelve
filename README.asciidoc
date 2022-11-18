@@ -239,3 +239,4 @@ Kenno::
 === 18.11
 
 Kenno:: Camera mount is halfway done. (1h)
+Pille:: Calibrating throwing. (1h15min)
