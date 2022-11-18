@@ -235,3 +235,7 @@ Pille::
 Kenno:: 
 	* Robot issues, design help and fixes. (1h30min)
 	* Brainstorming ideas for the camera mount. (30min)
+
+=== 18.11
+
+Kenno:: Camera mount is halfway done. (1h)
