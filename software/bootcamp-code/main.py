@@ -10,24 +10,43 @@ import json #for parsing referee commands into python library
 
 # method for listening to referee commands
 async def listen_referee(command_list):
-    async with websockets.connect('ws://localhost:8008') as websocket:
+    async with websockets.connect('ws://192.168.3.26:8222') as websocket:
         command = await websocket.recv()
         command_list.append(command) #adds to the end of the list
 
-# function to get the latest referee command
-def get_referee_commands(command_list):
-    # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
-    referee=json.loads(command_list[-1])
-    if referee["signal"] == "start": return State.FIND_BALL
-    else: return State.STOP
-
-# STATE MACHINE: 
+#STATE MACHINE
 class State(Enum):
     FIND_BALL = 0
     MOVE_CENTER_BALL = 1
     FIND_BASKET = 2
     THROW_BALL = 3
     STOP = 4
+
+
+global state
+global basket_blue
+
+# function to get the latest referee command
+def get_referee_commands(command_list):
+    # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
+    referee=json.loads(command_list[-1])
+    command=referee["signal"]
+    if command=="start" and ("twelve" in referee["targets"]):
+        state=State.STOP
+        if referee["targets"][0]=="twelve":
+            if referee["baskets"]=="magenta":
+                basket_blue=False
+            else: basket_blue=True
+        elif referee["targets"][1]=="twelve":
+            if referee["baskets"]=="magenta":
+                basket_blue=False
+            else: basket_blue=True
+    elif command=="stop":
+        if "twelve" in referee["targets"]:
+            state=State.STOP
+    return state, basket
+
+
 
 # function to print the state when changing state
 def state_printer(state, last_state, new_state):
@@ -121,7 +140,7 @@ def main_loop():
     # true false variable to keep track if when throwing, the ball has left the camera frame
     ball_out_of_frame=False
     # when throwing the ball, the speed which the robot moves forward
-    throw_move_speed=max_motor_speed/2
+    throw_move_speed=max_motor_speed/2/1.5
     # maximum and minimum speed to throw the ball
     throw_motor_speed_max=1750
     throw_motor_speed_min=650
@@ -140,7 +159,7 @@ def main_loop():
             if referee_active:
                 # listen for referee commands
                 # ayncio.get_event_loop().run_until_complete(listen_referee(command_list))
-                state=get_referee_commands(command_list)
+                state, basket_blue =get_referee_commands(command_list)
 
             # to test the thrower
             while test_thrower==True:
@@ -238,7 +257,7 @@ def main_loop():
 
                 # if the ball is out of frame then the throw duration should be 1.2s
                 throw_duration=time.time()-throw_start
-                if throw_duration>1.2 and ball_out_of_frame==True:
+                if throw_duration>2 and ball_out_of_frame==True:
                     state=State.FIND_BALL
                     throw_start=0
                     ball_out_of_frame=False
@@ -269,7 +288,7 @@ def main_loop():
 		
                 #if basket_dist_norm<0: thrower_speed_prop=0 # if the basket distance is a negative value, try again (bad values handling)
                 #else: thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
-                omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed/2, rot_speed_prop*throw_move_speed, thrower_speed_prop)
+                omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed, rot_speed_prop*throw_move_speed, thrower_speed_prop)
                 
             elif state==State.STOP:
                 omni_motion.move(0, 0, 0)
