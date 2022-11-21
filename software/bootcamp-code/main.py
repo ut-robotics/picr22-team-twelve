@@ -47,16 +47,16 @@ def norm_co(desired_location, coordinate, max_range):
     return proportional
 
 # method for getting the medium depth of the object in the x, y coordinate in 5x3 area around the location
-def get_depth(depth_frame, x, y):
-    center_px=depth_frame[x][y]
+def get_depth(depth_frame, y=0, x=0):
+    center_px=depth_frame[y][x]
     #print(center_px)
     counter=0
     sum=0
     # 5x3 matrix
-    for x_m in range(x-2, x+2):
-        for y_m in range(y-1, y+1):
+    for y_m in range(y, y+4):
+        for x_m in range(x-2, x+2):
             counter+=1
-            sum+=depth_frame[x_m][y_m]
+            sum+=depth_frame[y_m][x_m]
     return sum/counter
 
 def main_loop():
@@ -123,8 +123,8 @@ def main_loop():
     # when throwing the ball, the speed which the robot moves forward
     throw_move_speed=max_motor_speed/2
     # maximum and minimum speed to throw the ball
-    throw_motor_speed_max=2024
-    throw_motor_speed_min=800
+    throw_motor_speed_max=1750
+    throw_motor_speed_min=650
     thrower_speed_range=throw_motor_speed_max-throw_motor_speed_min
     # maximum basket distance in m
     max_basket_depth=4000
@@ -208,19 +208,19 @@ def main_loop():
                 #x-speed (side speed) is the proportional speed of the normalised difference between ball x coordinate and basket x coordinate
                 x_speed_prop = -1*norm_co(processedData.biggest_ball.x, 0, cam.rgb_width)*orbit_speed
                 if basket_to_throw.exists:
-                    x_speed_prop = -1*norm_co(basket_to_throw.x, processedData.biggest_ball.x, cam.rgb_width)*orbit_speed
+                    x_speed_prop = -1*norm_co(basket_to_throw.x, processedData.biggest_ball.x, cam.rgb_width)*orbit_speed*1.5
                 
                 # y-speed (forward speed) is calculated based on the distance of the ball
                 y_speed_prop = -1*norm_co(ball_desired_y, processedData.biggest_ball.distance, cam.rgb_height)
                 # rotational speed is the difference between the desired x-location of the ball and actual, normalized and proportional
                 rot_speed_prop = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
-                #print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
+                print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
                 if -0.1<x_speed_prop<0.1 and -0.1<rot_speed_prop<0.1 and -0.1<y_speed_prop<0.1 and basket_to_throw.exists:
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
-                omni_motion.move(x_speed_prop, orbit_speed*y_speed_prop, orbit_speed*rot_speed_prop)
+                omni_motion.move(x_speed_prop, orbit_speed*y_speed_prop, orbit_speed/1.5*rot_speed_prop)
 
 
             # drive ontop of the ball and throw it.
@@ -228,8 +228,8 @@ def main_loop():
             # Based on that you can either estimate a function or linearly interpolate the speeds.
             elif state==State.THROW_BALL:
 		# take depth frame basket x, y depth, better to take matrix of all the nearest and the medium of that
-                basket_depth = get_depth(processedData.depth_frame, basket_to_throw.y, basket_to_throw.x)
-                print("BASKET_DEPTH:", basket_depth)
+                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
+                #print("BASKET_DEPTH:", basket_depth)
                 # enters the if statement once to start the throw timer when the ball is out of frame
                 if ball_out_of_frame==False and (processedData.balls_exist==False or processedData.biggest_ball.y>450):
                     ball_out_of_frame=True
