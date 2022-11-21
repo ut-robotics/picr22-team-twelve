@@ -240,3 +240,7 @@ Kenno::
 
 Kenno:: Camera mount is halfway done. (1h)
 Pille:: Calibrating throwing. (1h15min)
+
+=== 21.11
+
+Kenno:: Fixing designs. (30min)
