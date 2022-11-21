@@ -264,7 +264,7 @@ def main_loop():
                 # normalize the basket distance
 
                 #basket_dist_norm = (basket_to_throw.distance)/cam.rgb_height
-                basket_dist_norm = norm_co(max_basket_depth, basket_depth, max_basket_depth)
+                basket_dist_norm = basket_depth/max_basket_depth
                 thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
 		
                 #if basket_dist_norm<0: thrower_speed_prop=0 # if the basket distance is a negative value, try again (bad values handling)
