@@ -243,4 +243,6 @@ Pille:: Calibrating throwing. (1h15min)
 
 === 21.11
 
-Kenno:: Fixing designs. (30min)
+Kenno:: 
+	* Fixing designs. (30min)
+	* Camera mount done. (2h)
