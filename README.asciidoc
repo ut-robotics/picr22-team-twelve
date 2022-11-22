@@ -246,3 +246,6 @@ Pille:: Calibrating throwing. (1h15min)
 Kenno:: 
 	* Fixing designs. (30min)
 	* Camera mount done. (2h)
+Pille::
+	* Fixing the ball throwing issues. Tried to get the thrower motor speed proportional to distance. Changed the basket distance calculations. (2h)
+	* Trying to get the referee command reactions working. Wasn't able to test properly, couldn't get the server running. (30min)
