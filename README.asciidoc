@@ -249,3 +249,8 @@ Kenno::
 Pille::
 	* Fixing the ball throwing issues. Tried to get the thrower motor speed proportional to distance. Changed the basket distance calculations. (2h)
 	* Trying to get the referee command reactions working. Wasn't able to test properly, couldn't get the server running. (30min)
+	
+=== 23.11
+
+Kenno:: 
+	* Real thrower designed. (45min)	
