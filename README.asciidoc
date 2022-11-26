@@ -253,4 +253,8 @@ Pille::
 === 23.11
 
 Kenno:: 
-	* Real thrower designed. (45min)	
+	* Real thrower designed. (45min)
+
+=== 26.11
+
+Pille:: Progress presentation slides. (15min)
