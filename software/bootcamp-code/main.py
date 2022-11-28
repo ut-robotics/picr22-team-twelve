@@ -8,45 +8,51 @@ import asyncio #for referee commands over websockets
 import websockets #before use: pip3.9 install websockets
 import json #for parsing referee commands into python library
 
-# method for listening to referee commands
-async def listen_referee(command_list):
-    async with websockets.connect('ws://192.168.3.26:8222') as websocket:
-        command = await websocket.recv()
-        command_list.append(command) #adds to the end of the list
-
 #STATE MACHINE
+# TODO: add test_thrower state
 class State(Enum):
     FIND_BALL = 0
     MOVE_CENTER_BALL = 1
     FIND_BASKET = 2
     THROW_BALL = 3
     STOP = 4
+    TEST_THROWER = 5
+    DRIVE_TO_OP_BASKET = 6
 
+global referee_connected
 
-global state
-global basket_blue
+# method for listening to referee commands
+async def listen_referee(command_list):
+    ip_addr='192.168.3.26:8222'
+    async with websockets.connect('ws://'+ip_addr) as websocket:
+        command = await websocket.recv()
+        command_list.append(command) #adds to the end of the list
+
+# global variables to change state when referee commands are active
+#global state
+#global basket_blue
 
 # function to get the latest referee command
-def get_referee_commands(command_list):
+def get_referee_commands(command_list, robot_id):
+    state=State.STOP
+    basket_blue=True
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
     referee=json.loads(command_list[-1])
     command=referee["signal"]
-    if command=="start" and ("twelve" in referee["targets"]):
+    if command=="start" and (robot_id in referee["targets"]):
         state=State.STOP
-        if referee["targets"][0]=="twelve":
+        if referee["targets"][0]==robot_id:
             if referee["baskets"]=="magenta":
                 basket_blue=False
             else: basket_blue=True
-        elif referee["targets"][1]=="twelve":
+        elif referee["targets"][1]==robot_id:
             if referee["baskets"]=="magenta":
                 basket_blue=False
             else: basket_blue=True
     elif command=="stop":
-        if "twelve" in referee["targets"]:
+        if robot_id in referee["targets"]:
             state=State.STOP
-    return state, basket
-
-
+    return state, basket_blue
 
 # function to print the state when changing state
 def state_printer(state, last_state, new_state):
@@ -78,13 +84,23 @@ def get_depth(depth_frame, y=0, x=0):
             sum+=depth_frame[y_m][x_m]
     return sum/counter
 
+# implement finding the closest basket
+def find_closest_basket(processedData, basket_blue_dist, basket_magn_dist):
+    basket_blue_dist=basket_blue_dist
+    basket_magn_dist=basket_magn_dist
+    if processedData.basket_b.exists:
+        basket_blue_dist = get_depth(processedData.depth_frame, 0, processedData.basket_b.x)
+    if processedData.basket_m.exists:
+        basket_magn_dist = get_depth(processedData.depth_frame, 0, processedData.basket_m.x)
+    furthest_basket="basket_b"
+    if basket_magn_dist>basket_blue_dist: furthest_basket="basket_m"
+    return furthest_basket, basket_blue_dist, basket_magn_dist
+
 def main_loop():
     # state to show camera image
     debug = False
     # state if to listen to referee commands, when competition, change to True
     referee_active = False
-    # if want to test the thrower, change to True
-    test_thrower = False
     # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
     basket_blue = True
 
@@ -109,11 +125,21 @@ def main_loop():
     
     # list for referee commands
     command_list=[]
-    if referee_active:
+    robot_id="twelve"
+    #if referee_active:
         # listen for referee commands if the referee is active
-        asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
+        #asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
+
     # default state to start with
     state=State.FIND_BALL
+    finder_timer=time.time()
+    max_find_time=15
+    furthest_basket = "basket_m"
+    basket_blue_dist, basket_magn_dist = 0
+
+    # if want to test the thrower, comment out
+    #state = State.TEST_THROWER
+    testing_thrower_speed=1900
 
     start = time.time()
     fps = 0
@@ -156,28 +182,21 @@ def main_loop():
         while True:
 	
             # get the referee command
+            # TODO: when connection lost, retry connection
             if referee_active:
                 # listen for referee commands
-                # ayncio.get_event_loop().run_until_complete(listen_referee(command_list))
-                state, basket_blue =get_referee_commands(command_list)
-
-            # to test the thrower
-            while test_thrower==True:
-                omni_motion.move(0, 0, 0, 1900)
-                print("testing thrower")
-                processedData=processor.process_frame(aligned_depth=False)
-                basket_depth = get_depth(processedData.depth_frame, processedData.basket_b.y, processedData.basket_b.x)
-                print(basket_depth)
-#                print(processor.process_frame(aligned_depth=False).basket_b.distance)
+                ayncio.get_event_loop().run_until_complete(listen_referee(command_list))
+                state, basket_blue =get_referee_commands(command_list, robot_id)
 
             # method for printing the state only when it changes
             if new_state==True: print(state)
             last_state, new_state =  state_printer(state, last_state, new_state)
             
-            # has argument aligned_depth that enables depth frame to color frame alignment. Costs performance
+            # Proccess the camera frame and get data
+            # has argument aligned_depth that enables depth frame to color frame alignment
             processedData = processor.process_frame(aligned_depth=False)
 	
-            # set the basket color to which we want to throw into
+            # get the basket data to which we want to throw into, depends which color basket is set
             basket_to_throw = processedData.basket_b
             if basket_blue==False: basket_to_throw=processedData.basket_m
 
@@ -189,12 +208,16 @@ def main_loop():
             
             # STATE TO FIND THE BALL
             if state == State.FIND_BALL:
+                # keep track which basket is the closest
+                furthest_basket, basket_blue_dist, basket_magn_dist = find_closest_basket(processedData, basket_blue_dist, basket_magn_dist)
+
                 # if we have a ball in view, center it
-                #if len(processedData.balls)>0:
                 if processedData.balls_exist==True:
                     state=State.MOVE_CENTER_BALL
                     continue
                 # if no ball found, rotate
+		elif time.time()-finder_timer>=max_find_time:
+                    state=State.DRIVE_TO_OP_BASKET
                 omni_motion.move(0, 0, find_rotation_speed)
 
             # STATE TO MOVE TO AND CENTER THE BALL
@@ -203,6 +226,7 @@ def main_loop():
                 #if len(processedData.balls)<1:
                 if processedData.balls_exist==False:
                     state=State.FIND_BALL
+                    finder_timer=time.time()
                     continue
                 
                 # if ball is close enough, circle it and find a basket (the distance is from the 0 coordinate - closer is larger value)
@@ -222,6 +246,7 @@ def main_loop():
                 # if there are no balls, then find one
                 if processedData.balls_exist==False:
                     state=State.FIND_BALL
+                    finder_timer=time.time()
                     continue
                     
                 #x-speed (side speed) is the proportional speed of the normalised difference between ball x coordinate and basket x coordinate
@@ -239,16 +264,11 @@ def main_loop():
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
-                omni_motion.move(x_speed_prop, orbit_speed*y_speed_prop, orbit_speed/1.5*rot_speed_prop)
+                omni_motion.move(x_speed_prop*1.5, orbit_speed*y_speed_prop, orbit_speed/1.5*rot_speed_prop) #added *1.5
 
-
-            # drive ontop of the ball and throw it.
-	        # TODO: For the thrower motor speeds, I suggest mapping the mainboard-speed to throwing distance.
-            # Based on that you can either estimate a function or linearly interpolate the speeds.
+            # THROW THE BALL STATE:
             elif state==State.THROW_BALL:
-		# take depth frame basket x, y depth, better to take matrix of all the nearest and the medium of that
-                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
-                #print("BASKET_DEPTH:", basket_depth)
+
                 # enters the if statement once to start the throw timer when the ball is out of frame
                 if ball_out_of_frame==False and (processedData.balls_exist==False or processedData.biggest_ball.y>450):
                     ball_out_of_frame=True
@@ -259,6 +279,8 @@ def main_loop():
                 throw_duration=time.time()-throw_start
                 if throw_duration>2 and ball_out_of_frame==True:
                     state=State.FIND_BALL
+                    finder_timer=time.time()
+                    # reset variables
                     throw_start=0
                     ball_out_of_frame=False
                     print("ball throwing time up")
@@ -274,24 +296,37 @@ def main_loop():
                 else:
                     #print("ball in view, calculate side-speed prop. to basket and ball x location difference")
                     # x speed aka side speed is proportional to the distance of the ball from the basket
-                    x_speed_prop = norm_co(processedData.biggest_ball.x, basket_to_throw.x, cam.rgb_width) # ? siin oli width/2
+                    x_speed_prop = norm_co(processedData.biggest_ball.x, basket_to_throw.x, cam.rgb_width)
                     rot_speed_prop = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
-
 		    
                 # y speed aka forward speed is proportional to the basket distance in the frame considering y coordinate -destination is 100pixels from the bottom edge
                 y_speed_prop=norm_co((cam.rgb_height-100), basket_to_throw.y, (cam.rgb_height-100))
-                # normalize the basket distance
-
-                #basket_dist_norm = (basket_to_throw.distance)/cam.rgb_height
+                # calculate the thrower motor speed based on the basket distance gotten from depth camera
+                # take depth frame basket x, y depth, better to take matrix of all the nearest and the medium of that
+                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
+                #print("BASKET_DEPTH:", basket_depth)
                 basket_dist_norm = basket_depth/max_basket_depth
                 thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
 		
-                #if basket_dist_norm<0: thrower_speed_prop=0 # if the basket distance is a negative value, try again (bad values handling)
-                #else: thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
-                omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed, rot_speed_prop*throw_move_speed, thrower_speed_prop)
+                omni_motion.move(-1*x_speed_prop*throw_move_speed*2, -1*y_speed_prop*throw_move_speed, rot_speed_prop*throw_move_speed*2, thrower_speed_prop) #added *2
                 
             elif state==State.STOP:
-                omni_motion.move(0, 0, 0)
+                omni_motion.move(0, 0, 0, 0)
+
+            # to test the thrower
+            elif state==State.TEST_THROWER:
+                omni_motion.move(0, 0, 0, testing_thrower_speed)
+                print("testing thrower")
+                processedData=processor.process_frame(aligned_depth=False)
+                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
+                print(basket_depth)
+                #print(processor.process_frame(aligned_depth=False).basket_b.distance)
+
+            elif state==State.DRIVE_TO_OP_BASKET:
+                basket_to_drive=processedData.basket_m
+                if furthest_basket == "basket_b": basket_to_drive=processedData.basket_b
+                # TODO: find the correct basket and then drive straight towards it while correcting movement like in the drive to ball state
+                omni_motion.move(0,0,0)
                 
 
             """# Mainboard and communication testing function.
