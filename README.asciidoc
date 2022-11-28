@@ -258,3 +258,7 @@ Kenno::
 === 26.11
 
 Pille:: Progress presentation slides. (15min)
+
+=== 28.11
+
+Pille:: Adding logic to code. Drive straight to furthest basket when no ball is found for 15s during the find ball state. (1h)
