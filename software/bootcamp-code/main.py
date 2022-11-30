@@ -16,8 +16,12 @@ class State(Enum):
     THROW_BALL = 3
     STOP = 4
     TEST_THROWER = 5
-    DRIVE_TO_OP_BASKET = 6
+    FIND_FURTHEST_BASKET = 6
+    DRIVE_TO_OP_BASKET = 7
 
+class BasketColor(Enum):
+    BLUE=0
+    MAGENTA=1
 
 # method for listening to referee commands
 async def listen_referee(command_list):
@@ -26,31 +30,27 @@ async def listen_referee(command_list):
         command = await websocket.recv()
         command_list.append(command) #adds to the end of the list
 
-# global variables to change state when referee commands are active
-#global state
-#global basket_blue
-
 # function to get the latest referee command
 def get_referee_commands(command_list, robot_id):
-    state=State.STOP
-    basket_blue=True
+    state=None
+    basket_color=BasketColor.BLUE
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
     referee=json.loads(command_list[-1])
     command=referee["signal"]
     if command=="start" and (robot_id in referee["targets"]):
         state=State.STOP
         if referee["targets"][0]==robot_id:
-            if referee["baskets"]=="magenta":
-                basket_blue=False
-            else: basket_blue=True
+            if referee["baskets"][0]=="magenta":
+                basket_color=BasketColor.MAGENTA
+            else: basket_color=BasketColor.BLUE
         elif referee["targets"][1]==robot_id:
-            if referee["baskets"]=="magenta":
-                basket_blue=False
-            else: basket_blue=True
+            if referee["baskets"][1]=="magenta":
+                basket_color=BasketColor.MAGENTA
+            else: basket_color=BasketColor.BLUE
     elif command=="stop":
         if robot_id in referee["targets"]:
             state=State.STOP
-    return state, basket_blue
+    return state, basket_color
 
 # function to print the state when changing state
 def state_printer(state, last_state, new_state):
@@ -82,30 +82,13 @@ def get_depth(depth_frame, y=0, x=0):
             sum+=depth_frame[y_m][x_m]
     return sum/counter
 
-basket_blue_d=0
-basket_magn_d=0
-
-# implement finding the closest basket
-def find_closest_basket(processedData):
-    global basket_blue_d, basket_magn_d
-    if processedData.basket_b.exists:
-        basket_blue_d_new = get_depth(processedData.depth_frame, processedData.basket_b.y, processedData.basket_b.x)
-        if basket_blue_d_new>basket_blue_d: basket_blue_d=basket_blue_d_new
-    if processedData.basket_m.exists:
-#        basket_magn_d = processedData.basket_m.distance
-        basket_magn_d_new = get_depth(processedData.depth_frame, processedData.basket_m.y, processedData.basket_m.x)
-        if basket_magn_d_new>basket_magn_d: basket_magn_d=basket_magn_d_new
-    if basket_blue_d>=basket_magn_d: furthest_basket="basket_b"
-    elif basket_magn_d>basket_blue_d: furthest_basket="basket_m"
-    return furthest_basket
-
 def main_loop():
     # state to show camera image
     debug = False
     # state if to listen to referee commands, when competition, change to True
     referee_active = False
     # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
-    basket_blue = False
+    basket_color = BasketColor.BLUE
 
     #motion_sim = motion.TurtleRobot()
     #motion_sim2 = motion.TurtleOmniRobot()
@@ -126,25 +109,22 @@ def main_loop():
     # open the serial connection
     omni_motion.open()
     
-    # list for referee commands
+    # list for referee commands and robot_id
     command_list=[]
     robot_id="twelve"
-    #if referee_active:
-        # listen for referee commands if the referee is active
-        #asyncio.get_event_loop().run_until_complete(listen_referee(command_list))
 
     # default state to start with
     state=State.FIND_BALL
+
     # variables to control driving to furthest basket when ball has not been found for max_find_time
     finder_timer=time.time()
     max_find_time=8
-    furthest_basket = "basket_m"
+    furthest_basket = BasketColor.BLUE
     basket_to_drive=None
-    global basket_blue_d, basket_magn_d
-#    basket_blue_d=0
-#    basket_magn_d=0
+    basket_blue_d=0
+    basket_magn_d=0
 
-    # if want to test the thrower, comment out
+    # if want to test the thrower, comment in
     #state = State.TEST_THROWER
     testing_thrower_speed=1900
 
@@ -156,7 +136,7 @@ def main_loop():
     # time counter for testing
     # zero_time = time.time()
         
-    # Ball desired coordinates are in the middle of the frame width and 83% of frame height
+    # Ball desired coordinates are in the middle of the frame width and 400 from the upper edge of the frame
     # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
     ball_desired_x = cam.rgb_width/2
     ball_desired_y = 400
@@ -173,7 +153,7 @@ def main_loop():
     # true false variable to keep track if when throwing, the ball has left the camera frame
     ball_out_of_frame=False
     # when throwing the ball, the speed which the robot moves forward
-    throw_move_speed=max_motor_speed/2/1.5
+    throw_move_speed=max_motor_speed/3
     # maximum and minimum speed to throw the ball
     throw_motor_speed_max=1750
     throw_motor_speed_min=650
@@ -193,7 +173,7 @@ def main_loop():
             if referee_active:
                 # listen for referee commands
                 ayncio.get_event_loop().run_until_complete(listen_referee(command_list))
-                state, basket_blue =get_referee_commands(command_list, robot_id)
+                state, basket_color =get_referee_commands(command_list, robot_id)
 
             # method for printing the state only when it changes
             if new_state==True: print(state)
@@ -205,7 +185,7 @@ def main_loop():
 	
             # get the basket data to which we want to throw into, depends which color basket is set
             basket_to_throw = processedData.basket_b
-            if basket_blue==False: basket_to_throw=processedData.basket_m
+            if basket_color==BasketColor.MAGENTA: basket_to_throw=processedData.basket_m
 
             # Here is the state machine for the driving logic.
             #   Omni-motion movement:
@@ -214,22 +194,20 @@ def main_loop():
             #   rotation if you want to turn
             
             # get the furthest basket data for the drive to the opposing basket state when ball has not been found in the find ball state
-            if furthest_basket == "basket_b": basket_to_drive=processedData.basket_b
-            elif furthest_basket == "basket_m": basket_to_drive=processedData.basket_m
+            if furthest_basket == BasketColor.BLUE: basket_to_drive=processedData.basket_b
+            elif furthest_basket == BasketColor.MAGENTA: basket_to_drive=processedData.basket_m
             
             # STATE TO FIND THE BALL
             if state == State.FIND_BALL:
-                # keep track which basket is the closest
-                furthest_basket  = find_closest_basket(processedData)
-                print(furthest_basket, basket_blue_d, basket_magn_d)
+
                 # if we have a ball in view, center it
                 if processedData.balls_exist==True:
                     state=State.MOVE_CENTER_BALL
                     continue
-
-                # if no ball has been found for given maximum time and the furthest basket is in view
-                elif (time.time()-finder_timer>=max_find_time) and basket_to_drive.exists:
-                    state=State.DRIVE_TO_OP_BASKET
+                print("Throw timer: ", time.time()-finder_timer)
+                # if no ball has been found for given maximum time find the furthest basket
+                elif (time.time()-finder_timer>=max_find_time):
+                    state=State.FIND_FURTHEST_BASKET
                 # if no ball found, rotate
                 omni_motion.move(0, 0, find_rotation_speed)
 
@@ -334,7 +312,26 @@ def main_loop():
                 basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
                 print(basket_depth)
                 #print(processor.process_frame(aligned_depth=False).basket_b.distance)
-            
+
+            elif state==State.FIND_FURTHEST_BASKET:
+                # rotate and find both the baskets, when found, drive to the furthest
+                if processedData.basket_b.exists:
+                    blue_basket_depth = get_depth(processedData.depth_frame, (processedData.basket_b.y+100), processedData.basket_b.x)
+                    if blue_basket_depth>basket_blue_d: basket_blue_d=blue_basket_depth
+                elif processedData.basket_m.exists:
+                    magn_basket_depth = get_depth(processedData.depth_frame, (processedData.basket_m.y+100), processedData.basket_m.x)
+                    if magn_basket_depth>basket_magn_d: basket_magn_d=magn_basket_depth
+
+                # compare and see which is furthest
+                if basket_blue_d>=basket_magn_d: furthest_basket=BasketColor.BLUE
+                elif basket_magn_d>basket_blue_d: furthest_basket=BasketColor.MAGENTA
+                
+                print(furthest_basket, basket_blue_d, basket_magn_d)
+                if basket_blue_d>0 and basket_magn_d>0 and basket_to_drive.exists:
+                    state=State.DRIVE_TO_OP_BASKET
+                    continue
+                omni_motion.move(0, 0, find_rotation_speed/2)
+
             # State to drive to the furthest basket when in the find_ball state the ball has not been found for some time.
             elif state==State.DRIVE_TO_OP_BASKET:
                 basket_depth = get_depth(processedData.depth_frame, 0, basket_to_drive.x)
