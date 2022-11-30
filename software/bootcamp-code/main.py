@@ -27,8 +27,9 @@ class BasketColor(Enum):
 async def listen_referee(command_list):
     ip_addr='192.168.3.26:8222'
     async with websockets.connect('ws://'+ip_addr) as websocket:
-        command = await websocket.recv()
-        command_list.append(command) #adds to the end of the list
+        while True:
+            command = await websocket.recv()
+            command_list.append(command) #adds to the end of the list
 
 # function to get the latest referee command
 def get_referee_commands(command_list, robot_id):
@@ -85,8 +86,6 @@ def get_depth(depth_frame, y=0, x=0):
 def main_loop():
     # state to show camera image
     debug = False
-    # state if to listen to referee commands, when competition, change to True
-    referee_active = False
     # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
     basket_color = BasketColor.BLUE
 
@@ -109,6 +108,12 @@ def main_loop():
     # open the serial connection
     omni_motion.open()
     
+    # state if to listen to referee commands, when needed, change to True
+    referee_active = False
+    # listen for referee commands
+    if referee_active:
+        asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
+        asyncio.new_event_loop().run_forever()
     # list for referee commands and robot_id
     command_list=[]
     robot_id="twelve"
@@ -169,11 +174,15 @@ def main_loop():
         while True:
 	
             # get the referee command
-            # TODO: when connection lost, retry connection
+            # when connection lost, retry connection
             if referee_active:
-                # listen for referee commands
-                ayncio.get_event_loop().run_until_complete(listen_referee(command_list))
-                state, basket_color =get_referee_commands(command_list, robot_id)
+                try:
+                    # listen for referee commands
+                    state, basket_color = get_referee_commands(command_list, robot_id)
+                except:
+                    print("referee server connection unavailable, reconnecting")
+                    asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
+                    asyncio.new_event_loop().run_forever()
 
             # method for printing the state only when it changes
             if new_state==True: print(state)
