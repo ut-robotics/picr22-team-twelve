@@ -274,3 +274,4 @@ Kenno::
 Pille:: 
 	* Finished driving straight to the opposing basket logic. (45min)
 	* On-site testing the drive to opposite basket logic, some problems. (2h)
+	* Added an extra state to the code for finding the furthest basket. Edited the referee server connection code. (1h15min)
