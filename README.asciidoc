@@ -273,4 +273,4 @@ Kenno::
 
 Pille:: 
 	* Finished driving straight to the opposing basket logic. (45min)
-	* On-site testing the drive to opposite basket logic, some problems. (1h30min)
+	* On-site testing the drive to opposite basket logic, some problems. (2h)
