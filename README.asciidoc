@@ -268,3 +268,7 @@ Pille:: Adding logic to code. Drive straight to furthest basket when no ball is 
 Kenno:: 
 	* Fixing the design issues. (30min)
 	* Chassis bottom plate done. (1h)
+
+=== 30.11
+
+Pille:: Finished driving straight to the opposing basket logic. (45min)
