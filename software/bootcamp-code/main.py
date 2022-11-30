@@ -132,9 +132,11 @@ def main_loop():
 
     # default state to start with
     state=State.FIND_BALL
+    # variables to control driving to furthest basket when ball has not been found for max_find_time
     finder_timer=time.time()
     max_find_time=15
     furthest_basket = "basket_m"
+    basket_to_drive=None
     basket_blue_dist, basket_magn_dist = 0
 
     # if want to test the thrower, comment out
@@ -171,7 +173,7 @@ def main_loop():
     throw_motor_speed_max=1750
     throw_motor_speed_min=650
     thrower_speed_range=throw_motor_speed_max-throw_motor_speed_min
-    # maximum basket distance in m
+    # maximum basket distance in mm
     max_basket_depth=4000
 
     # for printing logs (log when change state)
@@ -206,6 +208,10 @@ def main_loop():
             #   forward speed is y_speed
             #   rotation if you want to turn
             
+            # get the furthest basket data for the drive to the opposing basket state when ball has not been found in the find ball state
+            if furthest_basket == "basket_b": basket_to_drive=processedData.basket_b
+            elif furthest_basket == "basket_m": basket_to_drive=processedData.basket_m
+            
             # STATE TO FIND THE BALL
             if state == State.FIND_BALL:
                 # keep track which basket is the closest
@@ -215,9 +221,11 @@ def main_loop():
                 if processedData.balls_exist==True:
                     state=State.MOVE_CENTER_BALL
                     continue
-                # if no ball found, rotate
-		elif time.time()-finder_timer>=max_find_time:
+
+                # if no ball has been found for given maximum time and the furthest basket is in view
+		elif (time.time()-finder_timer>=max_find_time) and basket_to_drive.exists:
                     state=State.DRIVE_TO_OP_BASKET
+                # if no ball found, rotate
                 omni_motion.move(0, 0, find_rotation_speed)
 
             # STATE TO MOVE TO AND CENTER THE BALL
@@ -290,7 +298,7 @@ def main_loop():
                 if ball_out_of_frame==True:
                     #print("ball out of frame, calculate side-speed prop to basket x location")
                     x_speed_prop = norm_co(ball_desired_x, basket_to_throw.x, cam.rgb_width)
-                    rot_speed_prop = 0
+                    rot_speed_prop = x_speed_prop
 
                 # when the ball is in view, drive towards it, x-speed based on ball and basket x-coordinate difference
                 else:
@@ -321,12 +329,17 @@ def main_loop():
                 basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
                 print(basket_depth)
                 #print(processor.process_frame(aligned_depth=False).basket_b.distance)
-
+            
+            # State to drive to the furthest basket when in the find_ball state the ball has not been found for some time.
             elif state==State.DRIVE_TO_OP_BASKET:
-                basket_to_drive=processedData.basket_m
-                if furthest_basket == "basket_b": basket_to_drive=processedData.basket_b
-                # TODO: find the correct basket and then drive straight towards it while correcting movement like in the drive to ball state
-                omni_motion.move(0,0,0)
+                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_drive.x)
+                if basket_depth<200: # if basket is closer than 20cm
+                    state=State.FIND_BALL
+                    continue
+                # drive straight towards the furthest basket while correcting movement based on the baskets x, y coordinates
+                x_speed_prop = norm_co(ball_desired_x, basket_to_drive.x, cam.rgb_width)
+		y_speed_prop = norm_co((cam.rgb_height-100), basket_to_drive.y, (cam.rgb_height-100))
+                omni_motion.move(-1*x_speed_prop*max_motor_speed, -1*y_speed_prop*max_motor_speed, x_speed_prop*max_motor_speed)
                 
 
             """# Mainboard and communication testing function.
