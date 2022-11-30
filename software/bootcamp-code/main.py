@@ -89,9 +89,10 @@ basket_magn_d=0
 def find_closest_basket(processedData):
     global basket_blue_d, basket_magn_d
     if processedData.basket_b.exists:
-        basket_blue_d = get_depth(processedData.depth_frame, 0, processedData.basket_b.x)
+        basket_blue_d = get_depth(processedData.depth_frame, processedData.basket_b.y, processedData.basket_b.x)
     if processedData.basket_m.exists:
-        basket_magn_d = get_depth(processedData.depth_frame, 0, processedData.basket_m.x)
+#        basket_magn_d = processedData.basket_m.distance
+        basket_magn_d = get_depth(processedData.depth_frame, processedData.basket_m.y, processedData.basket_m.x)
     furthest_basket="basket_b"
     if basket_magn_d>basket_blue_d: furthest_basket="basket_m"
     return furthest_basket
