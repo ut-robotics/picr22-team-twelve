@@ -9,7 +9,6 @@ import websockets #before use: pip3.9 install websockets
 import json #for parsing referee commands into python library
 
 #STATE MACHINE
-# TODO: add test_thrower state
 class State(Enum):
     FIND_BALL = 0
     MOVE_CENTER_BALL = 1
@@ -19,7 +18,6 @@ class State(Enum):
     TEST_THROWER = 5
     DRIVE_TO_OP_BASKET = 6
 
-global referee_connected
 
 # method for listening to referee commands
 async def listen_referee(command_list):
@@ -84,17 +82,19 @@ def get_depth(depth_frame, y=0, x=0):
             sum+=depth_frame[y_m][x_m]
     return sum/counter
 
+basket_blue_d=0
+basket_magn_d=0
+
 # implement finding the closest basket
-def find_closest_basket(processedData, basket_blue_dist, basket_magn_dist):
-    basket_blue_dist=basket_blue_dist
-    basket_magn_dist=basket_magn_dist
+def find_closest_basket(processedData):
+    global basket_blue_d, basket_magn_d
     if processedData.basket_b.exists:
-        basket_blue_dist = get_depth(processedData.depth_frame, 0, processedData.basket_b.x)
+        basket_blue_d = get_depth(processedData.depth_frame, 0, processedData.basket_b.x)
     if processedData.basket_m.exists:
-        basket_magn_dist = get_depth(processedData.depth_frame, 0, processedData.basket_m.x)
+        basket_magn_d = get_depth(processedData.depth_frame, 0, processedData.basket_m.x)
     furthest_basket="basket_b"
-    if basket_magn_dist>basket_blue_dist: furthest_basket="basket_m"
-    return furthest_basket, basket_blue_dist, basket_magn_dist
+    if basket_magn_d>basket_blue_d: furthest_basket="basket_m"
+    return furthest_basket
 
 def main_loop():
     # state to show camera image
@@ -102,7 +102,7 @@ def main_loop():
     # state if to listen to referee commands, when competition, change to True
     referee_active = False
     # variable to store target basket color, currently blue for testing (if want magenta, change b to False)
-    basket_blue = True
+    basket_blue = False
 
     #motion_sim = motion.TurtleRobot()
     #motion_sim2 = motion.TurtleOmniRobot()
@@ -134,10 +134,11 @@ def main_loop():
     state=State.FIND_BALL
     # variables to control driving to furthest basket when ball has not been found for max_find_time
     finder_timer=time.time()
-    max_find_time=15
+    max_find_time=8
     furthest_basket = "basket_m"
     basket_to_drive=None
-    basket_blue_dist, basket_magn_dist = 0
+#    basket_blue_d=0
+#    basket_magn_d=0
 
     # if want to test the thrower, comment out
     #state = State.TEST_THROWER
@@ -215,15 +216,15 @@ def main_loop():
             # STATE TO FIND THE BALL
             if state == State.FIND_BALL:
                 # keep track which basket is the closest
-                furthest_basket, basket_blue_dist, basket_magn_dist = find_closest_basket(processedData, basket_blue_dist, basket_magn_dist)
-
+                furthest_basket  = find_closest_basket(processedData)
+                print(furthest_basket, basket_blue_d, basket_magn_d)
                 # if we have a ball in view, center it
                 if processedData.balls_exist==True:
                     state=State.MOVE_CENTER_BALL
                     continue
 
                 # if no ball has been found for given maximum time and the furthest basket is in view
-		elif (time.time()-finder_timer>=max_find_time) and basket_to_drive.exists:
+                elif (time.time()-finder_timer>=max_find_time) and basket_to_drive.exists:
                     state=State.DRIVE_TO_OP_BASKET
                 # if no ball found, rotate
                 omni_motion.move(0, 0, find_rotation_speed)
@@ -268,11 +269,11 @@ def main_loop():
                 rot_speed_prop = norm_co(ball_desired_x, processedData.biggest_ball.x, cam.rgb_width)
                 print("X_speed: ", x_speed_prop, "Y_speed: ", y_speed_prop, "rot: ", rot_speed_prop)
                 # if the basket and ball are in the center of the frame and ball is close enough move on to throwing
-                if -0.1<x_speed_prop<0.1 and -0.1<rot_speed_prop<0.1 and -0.1<y_speed_prop<0.1 and basket_to_throw.exists:
+                if -0.8<x_speed_prop<0.8 and -0.1<rot_speed_prop<0.1 and -0.1<y_speed_prop<0.1 and basket_to_throw.exists:
                     state = State.THROW_BALL
                     continue
                 # center the basket and the ball with orbiting, get the ball to the desired distance
-                omni_motion.move(x_speed_prop*1.5, orbit_speed*y_speed_prop, orbit_speed/1.5*rot_speed_prop) #added *1.5
+                omni_motion.move(x_speed_prop, orbit_speed*y_speed_prop, orbit_speed/1.5*rot_speed_prop) #added *1.5
 
             # THROW THE BALL STATE:
             elif state==State.THROW_BALL:
@@ -316,7 +317,7 @@ def main_loop():
                 basket_dist_norm = basket_depth/max_basket_depth
                 thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
 		
-                omni_motion.move(-1*x_speed_prop*throw_move_speed*2, -1*y_speed_prop*throw_move_speed, rot_speed_prop*throw_move_speed*2, thrower_speed_prop) #added *2
+                omni_motion.move(-1*x_speed_prop*throw_move_speed, -1*y_speed_prop*throw_move_speed, rot_speed_prop*throw_move_speed*2, thrower_speed_prop) #added *2
                 
             elif state==State.STOP:
                 omni_motion.move(0, 0, 0, 0)
@@ -333,12 +334,13 @@ def main_loop():
             # State to drive to the furthest basket when in the find_ball state the ball has not been found for some time.
             elif state==State.DRIVE_TO_OP_BASKET:
                 basket_depth = get_depth(processedData.depth_frame, 0, basket_to_drive.x)
-                if basket_depth<200: # if basket is closer than 20cm
+                if basket_depth<250: # if basket is closer than 20cm
                     state=State.FIND_BALL
+                    finder_timer=time.time()
                     continue
                 # drive straight towards the furthest basket while correcting movement based on the baskets x, y coordinates
                 x_speed_prop = norm_co(ball_desired_x, basket_to_drive.x, cam.rgb_width)
-		y_speed_prop = norm_co((cam.rgb_height-100), basket_to_drive.y, (cam.rgb_height-100))
+                y_speed_prop = norm_co((cam.rgb_height-100), basket_to_drive.y, (cam.rgb_height-100))
                 omni_motion.move(-1*x_speed_prop*max_motor_speed, -1*y_speed_prop*max_motor_speed, x_speed_prop*max_motor_speed)
                 
 
