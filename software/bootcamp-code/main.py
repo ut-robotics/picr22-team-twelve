@@ -89,12 +89,14 @@ basket_magn_d=0
 def find_closest_basket(processedData):
     global basket_blue_d, basket_magn_d
     if processedData.basket_b.exists:
-        basket_blue_d = get_depth(processedData.depth_frame, processedData.basket_b.y, processedData.basket_b.x)
+        basket_blue_d_new = get_depth(processedData.depth_frame, processedData.basket_b.y, processedData.basket_b.x)
+        if basket_blue_d_new>basket_blue_d: basket_blue_d=basket_blue_d_new
     if processedData.basket_m.exists:
 #        basket_magn_d = processedData.basket_m.distance
-        basket_magn_d = get_depth(processedData.depth_frame, processedData.basket_m.y, processedData.basket_m.x)
-    furthest_basket="basket_b"
-    if basket_magn_d>basket_blue_d: furthest_basket="basket_m"
+        basket_magn_d_new = get_depth(processedData.depth_frame, processedData.basket_m.y, processedData.basket_m.x)
+        if basket_magn_d_new>basket_magn_d: basket_magn_d=basket_magn_d_new
+    if basket_blue_d>=basket_magn_d: furthest_basket="basket_b"
+    elif basket_magn_d>basket_blue_d: furthest_basket="basket_m"
     return furthest_basket
 
 def main_loop():
@@ -138,6 +140,7 @@ def main_loop():
     max_find_time=8
     furthest_basket = "basket_m"
     basket_to_drive=None
+    global basket_blue_d, basket_magn_d
 #    basket_blue_d=0
 #    basket_magn_d=0
 
@@ -337,6 +340,8 @@ def main_loop():
                 basket_depth = get_depth(processedData.depth_frame, 0, basket_to_drive.x)
                 if basket_depth<250: # if basket is closer than 20cm
                     state=State.FIND_BALL
+                    basket_blue_d=0
+                    basket_magn_d=0
                     finder_timer=time.time()
                     continue
                 # drive straight towards the furthest basket while correcting movement based on the baskets x, y coordinates
