@@ -117,11 +117,11 @@ def main_loop():
 #        asyncio.create_task(listen_referee(command_list))
 #        asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
 #        asyncio.new_event_loop().run_forever()
-        print("end if")
+        state=State.STOP
     # list for referee commands and robot_id
-
-    # default state to start with
-    state=State.FIND_BALL
+    else:
+        # default state to start with
+        state=State.FIND_BALL
 
     # variables to control driving to furthest basket when ball has not been found for max_find_time
     finder_timer=time.time()
@@ -184,7 +184,7 @@ def main_loop():
                     # listen for referee commands
                     print(command_list)
                     state, basket_color = get_referee_commands(command_list, robot_id)
-                    print(state, basket_color)
+                    print("GOT: ", state, basket_color)
                 except:
                     print("referee server connection unavailable, reconnecting")
 #                    thread.start()
