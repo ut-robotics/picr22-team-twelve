@@ -7,6 +7,7 @@ from enum import Enum # for state machine enumerate
 import asyncio #for referee commands over websockets
 import websockets #before use: pip3.9 install websockets
 import json #for parsing referee commands into python library
+from threading import Thread
 
 #STATE MACHINE
 class State(Enum):
@@ -23,23 +24,30 @@ class BasketColor(Enum):
     BLUE=0
     MAGENTA=1
 
+def run_websocket(command_list):
+    asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
+
 # method for listening to referee commands
 async def listen_referee(command_list):
-    ip_addr='192.168.3.26:8222'
+    ip_addr='192.168.3.28:8222'
     async with websockets.connect('ws://'+ip_addr) as websocket:
         while True:
+            print("while")
             command = await websocket.recv()
             command_list.append(command) #adds to the end of the list
 
 # function to get the latest referee command
 def get_referee_commands(command_list, robot_id):
+    print("GET")
+    if len(command_list)==0:
+        return State.STOP, BasketColor.BLUE
     state=None
     basket_color=BasketColor.BLUE
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
-    referee=json.loads(command_list[-1])
+    referee=json.loads(command_list.pop())
     command=referee["signal"]
     if command=="start" and (robot_id in referee["targets"]):
-        state=State.STOP
+        state=State.START
         if referee["targets"][0]==robot_id:
             if referee["baskets"][0]=="magenta":
                 basket_color=BasketColor.MAGENTA
@@ -51,6 +59,7 @@ def get_referee_commands(command_list, robot_id):
     elif command=="stop":
         if robot_id in referee["targets"]:
             state=State.STOP
+    print("return", state, basket_color)
     return state, basket_color
 
 # function to print the state when changing state
@@ -96,25 +105,33 @@ def main_loop():
     omni_motion.open()
     
     # state if to listen to referee commands, when needed, change to True
-    referee_active = False
-    # listen for referee commands
-    if referee_active:
-        asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
-        asyncio.new_event_loop().run_forever()
-    # list for referee commands and robot_id
+    referee_active = True
     command_list=[]
     robot_id="twelve"
+
+    # listen for referee commands
+    if referee_active:
+        print("start if")
+        thread = Thread(target=run_websocket, args=(command_list,))
+        thread.start()
+#        asyncio.create_task(listen_referee(command_list))
+#        asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
+#        asyncio.new_event_loop().run_forever()
+        print("end if")
+    # list for referee commands and robot_id
 
     # default state to start with
     state=State.FIND_BALL
 
     # variables to control driving to furthest basket when ball has not been found for max_find_time
     finder_timer=time.time()
-    max_find_time=8
+    max_find_time=5
     furthest_basket = BasketColor.BLUE
     basket_to_drive=None
     basket_blue_d=0
     basket_magn_d=0
+    start_opbasket_drive=time.time()
+
 
     # if want to test the thrower, comment in
     #state = State.TEST_THROWER
@@ -136,7 +153,7 @@ def main_loop():
     # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
     max_motor_speed = 80
     # rotation speed for find ball state
-    find_rotation_speed = max_motor_speed/5
+    find_rotation_speed = max_motor_speed/6
     # orbiting speed for centering the basket
     orbit_speed = max_motor_speed/1.5
 
@@ -165,11 +182,14 @@ def main_loop():
             if referee_active:
                 try:
                     # listen for referee commands
+                    print(command_list)
                     state, basket_color = get_referee_commands(command_list, robot_id)
+                    print(state, basket_color)
                 except:
                     print("referee server connection unavailable, reconnecting")
-                    asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
-                    asyncio.new_event_loop().run_forever()
+#                    thread.start()
+#                    asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
+#                    asyncio.new_event_loop().run_forever()
 
             # method for printing the state only when it changes
             if new_state==True: print(state)
@@ -202,10 +222,11 @@ def main_loop():
                 if processedData.balls_exist==True:
                     state=State.MOVE_CENTER_BALL
                     continue
-                print("Throw timer: ", time.time()-finder_timer)
                 # if no ball has been found for given maximum time find the furthest basket
-                elif (time.time()-finder_timer>=max_find_time):
+                elif (time.time()-finder_timer)>=max_find_time:
                     state=State.FIND_FURTHEST_BASKET
+                print("Throw timer: ", time.time()-finder_timer)
+
                 # if no ball found, rotate
                 omni_motion.move(0, 0, find_rotation_speed)
 
@@ -326,13 +347,14 @@ def main_loop():
                 print(furthest_basket, basket_blue_d, basket_magn_d)
                 if basket_blue_d>0 and basket_magn_d>0 and basket_to_drive.exists:
                     state=State.DRIVE_TO_OP_BASKET
+                    start_opbasket_drive=time.time()
                     continue
                 omni_motion.move(0, 0, find_rotation_speed/2)
 
             # State to drive to the furthest basket when in the find_ball state the ball has not been found for some time.
             elif state==State.DRIVE_TO_OP_BASKET:
                 basket_depth = basket_to_drive.distance
-                if basket_depth<250 or processedData.balls_exist==True: # if basket is closer than 25cm
+                if (time.time()-start_opbasket_drive)>2.2: # or processedData.balls_exist==True: # if basket is closer than 25cm
                     state=State.FIND_BALL
                     basket_blue_d=0
                     basket_magn_d=0
@@ -341,7 +363,7 @@ def main_loop():
                 # drive straight towards the furthest basket while correcting movement based on the baskets x, y coordinates
                 x_speed_prop = norm_co(ball_desired_x, basket_to_drive.x, cam.rgb_width)
                 y_speed_prop = norm_co((cam.rgb_height-100), basket_to_drive.y, (cam.rgb_height-100))
-                omni_motion.move(-1*x_speed_prop*max_motor_speed, -1*y_speed_prop*max_motor_speed, x_speed_prop*max_motor_speed)
+                omni_motion.move(-1*x_speed_prop*max_motor_speed/2, -1*y_speed_prop*max_motor_speed, x_speed_prop*max_motor_speed/2)
                 
 
             """# Mainboard and communication testing function.
