@@ -70,19 +70,6 @@ def norm_co(desired_location, coordinate, max_range):
     proportional = (desired_location - coordinate)/max_range
     return proportional
 
-# method for getting the medium depth of the object in the x, y coordinate in 5x3 area around the location
-def get_depth(depth_frame, y=0, x=0):
-    center_px=depth_frame[y][x]
-    #print(center_px)
-    counter=0
-    sum=0
-    # 5x3 matrix
-    for y_m in range(y, y+4):
-        for x_m in range(x-2, x+2):
-            counter+=1
-            sum+=depth_frame[y_m][x_m]
-    return sum/counter
-
 def main_loop():
     # state to show camera image
     debug = False
@@ -189,8 +176,10 @@ def main_loop():
             last_state, new_state =  state_printer(state, last_state, new_state)
             
             # Proccess the camera frame and get data
+            aligned=False
+            if (state==State.THROW_BALL or state==State.FIND_FURTHEST_BASKET or state==State.DRIVE_TO_OP_BASKET): aligned=True
             # has argument aligned_depth that enables depth frame to color frame alignment
-            processedData = processor.process_frame(aligned_depth=False)
+            processedData = processor.process_frame(aligned_depth=aligned)
 	
             # get the basket data to which we want to throw into, depends which color basket is set
             basket_to_throw = processedData.basket_b
@@ -201,10 +190,6 @@ def main_loop():
             #   side speed is x_speed
             #   forward speed is y_speed
             #   rotation if you want to turn
-            
-            # get the furthest basket data for the drive to the opposing basket state when ball has not been found in the find ball state
-            if furthest_basket == BasketColor.BLUE: basket_to_drive=processedData.basket_b
-            elif furthest_basket == BasketColor.MAGENTA: basket_to_drive=processedData.basket_m
             
             # STATE TO FIND THE BALL
             if state == State.FIND_BALL:
@@ -303,7 +288,7 @@ def main_loop():
                 y_speed_prop=norm_co((cam.rgb_height-100), basket_to_throw.y, (cam.rgb_height-100))
                 # calculate the thrower motor speed based on the basket distance gotten from depth camera
                 # take depth frame basket x, y depth, better to take matrix of all the nearest and the medium of that
-                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
+                basket_depth = basket_to_throw.distance
                 #print("BASKET_DEPTH:", basket_depth)
                 basket_dist_norm = basket_depth/max_basket_depth
                 thrower_speed_prop=basket_dist_norm*thrower_speed_range+throw_motor_speed_min
@@ -318,24 +303,23 @@ def main_loop():
                 omni_motion.move(0, 0, 0, testing_thrower_speed)
                 print("testing thrower")
                 processedData=processor.process_frame(aligned_depth=False)
-                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_throw.x)
+                basket_depth = basket_to_throw.distance
                 print(basket_depth)
-                #print(processor.process_frame(aligned_depth=False).basket_b.distance)
 
             elif state==State.FIND_FURTHEST_BASKET:
                 # rotate and find both the baskets, when found, drive to the furthest
                 if processedData.basket_b.exists:
-                    blue_basket_depth = get_depth(processedData.depth_frame, (processedData.basket_b.y+100), processedData.basket_b.x)
+                    blue_basket_depth = processedData.basket_b.distance
                     if blue_basket_depth>basket_blue_d: basket_blue_d=blue_basket_depth
                 elif processedData.basket_m.exists:
-                    magn_basket_depth = get_depth(processedData.depth_frame, (processedData.basket_m.y+100), processedData.basket_m.x)
+                    magn_basket_depth = processedData.basket_m.distance
                     if magn_basket_depth>basket_magn_d: basket_magn_d=magn_basket_depth
 
                 # compare and see which is furthest
-                if basket_blue_d>=basket_magn_d: furthest_basket=BasketColor.BLUE
-                elif basket_magn_d>basket_blue_d: furthest_basket=BasketColor.MAGENTA
+                if basket_blue_d>=basket_magn_d: basket_to_drive=processedData.basket_b
+                elif basket_magn_d>basket_blue_d: basket_to_drive=processedData.basket_m
                 
-                print(furthest_basket, basket_blue_d, basket_magn_d)
+                print(basket_to_drive, basket_blue_d, basket_magn_d)
                 if basket_blue_d>0 and basket_magn_d>0 and basket_to_drive.exists:
                     state=State.DRIVE_TO_OP_BASKET
                     continue
@@ -343,8 +327,8 @@ def main_loop():
 
             # State to drive to the furthest basket when in the find_ball state the ball has not been found for some time.
             elif state==State.DRIVE_TO_OP_BASKET:
-                basket_depth = get_depth(processedData.depth_frame, 0, basket_to_drive.x)
-                if basket_depth<250: # if basket is closer than 20cm
+                basket_depth = basket_to_drive.distance
+                if basket_depth<250 or processedData.balls_exist==True: # if basket is closer than 25cm
                     state=State.FIND_BALL
                     basket_blue_d=0
                     basket_magn_d=0
