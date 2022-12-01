@@ -279,3 +279,6 @@ Pille::
 === 01.12
 
 Kenno:: Chassis design and other design issues. (2h)
+Pille:: 
+	* Changing the code based on feedback. (30min).
+	* ...
