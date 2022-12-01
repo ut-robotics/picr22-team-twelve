@@ -122,6 +122,18 @@ class ImageProcessor():
             biggest_ball = balls[-1]
             
         return balls, biggest_ball
+    
+    # method for getting the medium depth of the object in the x, y coordinate in 5x3 area around the location
+    def get_depth(self, depth_frame, y, x):
+        center_px=depth_frame[y][x]
+        counter=0
+        sum=0
+        # 5x3 matrix
+        for y_m in range(y, y+4):
+            for x_m in range(x-2, x+2):
+                counter+=1
+                sum+=depth_frame[y_m][x_m]
+        return sum/counter
 
     def analyze_baskets(self, t_basket, debug_color = (0, 255, 255)) -> list:
         contours, hierarchy = cv2.findContours(t_basket, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -140,7 +152,8 @@ class ImageProcessor():
 
             obj_x = int(x + (w/2))
             obj_y = int(y + (h/2))
-            obj_dst = obj_y
+            # added depth calculations to image processor, basket objext distance field
+            obj_dst = self.get_depth(self, depth_frame, obj_y, obj_x)
 
             baskets.append(Object(x = obj_x, y = obj_y, size = size, distance = obj_dst, exists = True))
 
@@ -169,8 +182,8 @@ class ImageProcessor():
             self.debug_frame = np.copy(color_frame)
 
         balls, biggest_ball = self.analyze_balls(self.t_balls, self.fragmented)
-        basket_b = self.analyze_baskets(self.t_basket_b, debug_color=c.Color.BLUE.color.tolist())
-        basket_m = self.analyze_baskets(self.t_basket_m, debug_color=c.Color.MAGENTA.color.tolist())
+        basket_b = self.analyze_baskets(self.t_basket_b, depth_frame, debug_color=c.Color.BLUE.color.tolist())
+        basket_m = self.analyze_baskets(self.t_basket_m, depth_frame, debug_color=c.Color.MAGENTA.color.tolist())
         if len(balls)>0: balls_exist=True
         else: balls_exist=False
 
