@@ -184,7 +184,11 @@ def main_loop():
             # get the basket data to which we want to throw into, depends which color basket is set
             basket_to_throw = processedData.basket_b
             if basket_color==BasketColor.MAGENTA: basket_to_throw=processedData.basket_m
-
+            
+            # get the furthest basket data for the drive to the opposing basket state when ball has not been found in the find ball state
+            if furthest_basket == BasketColor.BLUE: basket_to_drive=processedData.basket_b
+            elif furthest_basket == BasketColor.MAGENTA: basket_to_drive=processedData.basket_m
+            
             # Here is the state machine for the driving logic.
             #   Omni-motion movement:
             #   side speed is x_speed
@@ -316,10 +320,10 @@ def main_loop():
                     if magn_basket_depth>basket_magn_d: basket_magn_d=magn_basket_depth
 
                 # compare and see which is furthest
-                if basket_blue_d>=basket_magn_d: basket_to_drive=processedData.basket_b
-                elif basket_magn_d>basket_blue_d: basket_to_drive=processedData.basket_m
+                if basket_blue_d>=basket_magn_d: furthest_basket=BasketColor.BLUE
+                elif basket_magn_d>basket_blue_d: furthest_basket=BasketColor.MAGENTA
                 
-                print(basket_to_drive, basket_blue_d, basket_magn_d)
+                print(furthest_basket, basket_blue_d, basket_magn_d)
                 if basket_blue_d>0 and basket_magn_d>0 and basket_to_drive.exists:
                     state=State.DRIVE_TO_OP_BASKET
                     continue
