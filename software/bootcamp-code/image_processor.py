@@ -152,8 +152,8 @@ class ImageProcessor():
 
             obj_x = int(x + (w/2))
             obj_y = int(y + (h/2))
-            # added depth calculations to image processor, basket objext distance field
-            obj_dst = self.get_depth(self, depth_frame, obj_y, obj_x)
+            # added depth calculations to image processor, basket objext distance field, y is 50 pixels from the top edge
+            obj_dst = self.get_depth(self, depth_frame, 50, obj_x)
 
             baskets.append(Object(x = obj_x, y = obj_y, size = size, distance = obj_dst, exists = True))
 
