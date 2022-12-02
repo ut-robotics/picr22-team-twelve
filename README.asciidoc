@@ -285,4 +285,6 @@ Pille::
 
 === 02.12
 
-Kenno:: Github mechanics issues fixed. (30min)
+Kenno:: 
+	* Github mechanics issues fixed. (30min)
+	* Some of the major cutouts of top plate are done, fixed issues with bottom plate, gave up because the post/pillar cutouts are horrible to deal with and get 		right. (2h)
