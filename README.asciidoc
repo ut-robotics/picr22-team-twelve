@@ -281,7 +281,7 @@ Pille::
 Kenno:: Chassis design and other design issues. (2h)
 Pille:: 
 	* Changing the code based on feedback. (1h).
-	* On-site testing and presenting.
+	* On-site testing and presenting. (1h30min)
 
 === 02.12
 
