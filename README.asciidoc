@@ -293,3 +293,4 @@ Kenno::
 
 Kenno:: 
 	* Finally the chassis bottom plate issues seem to be fixed. (30min)
+	* The chassis design should be done. (3h)
