@@ -37,13 +37,12 @@ async def listen_referee(command_list):
             command_list.append(command) #adds to the end of the list
 
 # function to get the latest referee command
-def get_referee_commands(command_list, robot_id):
+def get_referee_commands(command_list, robot_id, state, basket_color):
     print("GET")
     # if there are no commands in the list, return STOP and basketcolor blue
     if len(command_list)==0:
         print("no commands in list")
-        # TODO: how to not change the state?
-        return State.STOP, BasketColor.BLUE
+        return state, basket_color
 
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
     # pop from the list, but then problems with empty list changing state to stop. Instead just view the last command over and over again
@@ -54,7 +53,7 @@ def get_referee_commands(command_list, robot_id):
     # if -1 then it wasn't my command, return
     if my_index == -1:
         print("not my command")
-        return State.STOP, BasketColor.Blue
+        return state, basket_color
     
     command=referee["signal"][my_index]
     if command=="start":
@@ -186,7 +185,7 @@ def main_loop():
                 try:
                     # listen for referee commands
                     print(command_list)
-                    state, basket_color = get_referee_commands(command_list, robot_id)
+                    state, basket_color = get_referee_commands(command_list, robot_id, state, basket_color)
                     print("GOT: ", state, basket_color)
                 except:
                     print("EXCEPTION")
