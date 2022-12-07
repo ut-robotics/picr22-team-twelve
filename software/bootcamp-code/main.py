@@ -39,28 +39,34 @@ async def listen_referee(command_list):
 # function to get the latest referee command
 def get_referee_commands(command_list, robot_id):
     print("GET")
+    # if there are no commands in the list, return STOP and basketcolor blue
     if len(command_list)==0:
+        print("no commands in list")
+        # TODO: how to not change the state?
         return State.STOP, BasketColor.BLUE
-    state=None
-    basket_color=BasketColor.BLUE
+
     # parse referee commands into python library (https://www.w3schools.com/python/python_json.asp)
-    referee=json.loads(command_list.pop())
-    command=referee["signal"]
-    if command=="start" and (robot_id in referee["targets"]):
-        state=State.START
-        if referee["targets"][0]==robot_id:
-            if referee["baskets"][0]=="magenta":
-                basket_color=BasketColor.MAGENTA
-            else: basket_color=BasketColor.BLUE
-        elif referee["targets"][1]==robot_id:
-            if referee["baskets"][1]=="magenta":
-                basket_color=BasketColor.MAGENTA
-            else: basket_color=BasketColor.BLUE
+    # pop from the list, but then problems with empty list changing state to stop. Instead just view the last command over and over again
+    #referee=json.loads(command_list.pop())
+    referee=json.loads(command_list[-1])
+    # get the index commands meant for my robot id
+    my_index = referee["targets"].index(robot_id)
+    # if -1 then it wasn't my command, return
+    if my_index == -1:
+        print("not my command")
+        return State.STOP, BasketColor.Blue
+    
+    command=referee["signal"][my_index]
+    if command=="start":
+        current_state = State.FIND_BALL
+        color = referee["baskets"][my_index]
+        if color == "magenta": current_target = BasketColor.MAGENTA
+        else: current_target = BasketColor.BLUE
+        print("return start:" current_state, current_target)
+        return current_state, current_target
     elif command=="stop":
-        if robot_id in referee["targets"]:
-            state=State.STOP
-    print("return", state, basket_color)
-    return state, basket_color
+        print("return stop")
+        return State.STOP, BasketColor.BLUE
 
 # function to print the state when changing state
 def state_printer(state, last_state, new_state):
@@ -111,12 +117,9 @@ def main_loop():
 
     # listen for referee commands
     if referee_active:
-        print("start if")
+        print("start referee")
         thread = Thread(target=run_websocket, args=(command_list,))
         thread.start()
-#        asyncio.create_task(listen_referee(command_list))
-#        asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
-#        asyncio.new_event_loop().run_forever()
         state=State.STOP
     # list for referee commands and robot_id
     else:
@@ -186,10 +189,7 @@ def main_loop():
                     state, basket_color = get_referee_commands(command_list, robot_id)
                     print("GOT: ", state, basket_color)
                 except:
-                    print("referee server connection unavailable, reconnecting")
-#                    thread.start()
-#                    asyncio.new_event_loop().run_until_complete(listen_referee(command_list))
-#                    asyncio.new_event_loop().run_forever()
+                    print("EXCEPTION")
 
             # method for printing the state only when it changes
             if new_state==True: print(state)
