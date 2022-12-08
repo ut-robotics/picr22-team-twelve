@@ -298,3 +298,7 @@ Kenno::
 === 07.12
 
 Pille:: Rewriting reacting to referee commands (30min).
+
+=== 08.12
+
+Kenno:: 3D printing the wheel parts. (30min)
