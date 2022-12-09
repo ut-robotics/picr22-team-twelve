@@ -302,3 +302,7 @@ Pille:: Rewriting reacting to referee commands (30min).
 === 08.12
 
 Kenno:: 3D printing the wheel parts. (30min)
+
+=== 09.12
+
+Kenno:: Fixing chassis issues. (2h)
