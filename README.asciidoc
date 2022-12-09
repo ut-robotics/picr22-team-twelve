@@ -305,4 +305,4 @@ Kenno:: 3D printing the wheel parts. (30min)
 
 === 09.12
 
-Kenno:: Fixing chassis issues. (2h)
+Kenno:: Fixing chassis issues. (3h)
