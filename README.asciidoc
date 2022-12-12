@@ -318,3 +318,4 @@ Kenno::
 	* Still fixing the chassis issues. (2h)
 	* Presentation and measuring on site. (45min)
 	* Fixed chassis electronics models. (30min)
+	* Started with CAM. (30min)
