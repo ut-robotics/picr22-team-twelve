@@ -310,3 +310,8 @@ Kenno:: Fixing chassis issues. (3h)
 === 11.12
 
 Pille: Presentation slides, reviewing team progress and planning (30min).
+
+=== 12.12
+
+Kenno:: 
+	* Slides. (10min)	
