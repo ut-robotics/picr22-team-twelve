@@ -319,3 +319,8 @@ Kenno::
 	* Presentation and measuring on site. (45min)
 	* Fixed chassis electronics models. (30min)
 	* Started with CAM. (30min)
+
+
+=== 13.12
+
+Kenno:: CAM done and mechanics issues on github fixed. (2h)
