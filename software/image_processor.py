@@ -125,15 +125,8 @@ class ImageProcessor():
     
     # method for getting the medium depth of the object in the x, y coordinate in 5x3 area around the location
     def get_depth(self, depth_frame, y, x):
-        center_px=depth_frame[y][x]
-        counter=0
-        sum=0
-        # 5x3 matrix
-        for y_m in range(y, y+4):
-            for x_m in range(x-2, x+2):
-                counter+=1
-                sum+=depth_frame[y_m][x_m]
-        return sum/counter
+        mean = np.mean((depth_frame[y:y+4, x-2:x+2]))
+        return mean
 
     def analyze_baskets(self, t_basket, debug_color = (0, 255, 255)) -> list:
         contours, hierarchy = cv2.findContours(t_basket, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
