@@ -47,9 +47,8 @@ The `main.py` holds the state machine for the driving logic. For configurations 
 
 
 === Analysis
-----
-A short analysis of what was good and bad in your code and how to improve.
-----
+
+I think the state machine could be in an another file as well as the referee server, it would make the code easier to read. Also the calculations made in the states could be written better. As a pluss I would say, it is a rather simple implementation broken down to understandable piecies of driving logic.
 
 
 == Mechanics
