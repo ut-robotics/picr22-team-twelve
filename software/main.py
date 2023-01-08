@@ -30,11 +30,12 @@ def run_websocket(command_list):
 # method for listening to referee commands
 async def listen_referee(command_list):
     ip_addr='192.168.3.28:8222'
-    async with websockets.connect('ws://'+ip_addr) as websocket:
-        while True:
-            print("while")
-            command = await websocket.recv()
-            command_list.append(command) #adds to the end of the list
+    while True:
+        async with websockets.connect('ws://'+ip_addr) as websocket:
+            while True:
+                print("while")
+                command = await websocket.recv()
+                command_list.append(command) #adds to the end of the list
 
 # function to get the latest referee command
 def get_referee_commands(command_list, robot_id, state, basket_color):
@@ -150,7 +151,7 @@ def main_loop():
     # Ball desired coordinates are in the middle of the frame width and 400 from the upper edge of the frame
     # (THE ZERO COORDINATES OF THE FRAME ARE IN THE UPPER LEFT CORNER.)
     ball_desired_x = cam.rgb_width/2
-    ball_desired_y = 400
+    ball_desired_y = cam.rgb_height*0.8
 
     # Speed range for motors is 48 - 2047, we use 100 for max motor speed at the moment.
     max_motor_speed = 80
@@ -196,7 +197,7 @@ def main_loop():
             
             # Proccess the camera frame and get data
             aligned=False
-            if (state==State.THROW_BALL or state==State.FIND_FURTHEST_BASKET or state==State.DRIVE_TO_OP_BASKET): aligned=True
+            if state in (State.THROW_BALL, State.FIND_FURTHEST_BASKET, State.DRIVE_TO_OP_BASKET): aligned=True
             # has argument aligned_depth that enables depth frame to color frame alignment
             processedData = processor.process_frame(aligned_depth=aligned)
 	
@@ -218,7 +219,7 @@ def main_loop():
             if state == State.FIND_BALL:
 
                 # if we have a ball in view, center it
-                if processedData.balls_exist==True:
+                if processedData.balls_exist:
                     state=State.MOVE_CENTER_BALL
                     continue
                 # if no ball has been found for given maximum time find the furthest basket
