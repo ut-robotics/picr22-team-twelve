@@ -47,11 +47,6 @@ touch colors/colors.pkl
 python3.9 config_colors.py
 ----
 
-Running an example:
-----
-python3.9 main.py
-----
-
 Configuring serial port permissions:
 ----
 sudo dmesg | grep tty
