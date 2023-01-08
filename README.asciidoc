@@ -6,9 +6,11 @@
 * Kenno Kallastu - Mechanics
 [line-through]#* Stepan Denysenko - Electronics#
 
+
 === Public Fusion 360 project for mechanics
 (Currently the test robot, will be updated to the actual robot when it's done)
 Link: https://a360.co/3haaYUI
+
 
 == Programming
 
@@ -30,16 +32,25 @@ Libraries used::
 	* serial - to connect to the mainboard via serial;
 	* serial.tools.list_ports - to check all the available serial ports.
 
+
 === Description of game logic and code structure
-----
-A brief description of your game logic and overall code structure.
-A block diagram of your game logic.
-----
+
+The code is broken down to 6 files::
+	* config_colors.py - Utility to configure colors. Check log for detailed instructions.
+	* color.py - contains color information and its enum class.
+	* camera.py - contains the camera proccessing code and describes methods required by the image processing module (for different camera types).
+	* image processor.py - main file for image processing, provides processed frame data. Object analysing and filtration.
+	* motion.py - Contains a IRobotMotion interface that descibes method required for moving the robot. Has the driving logic for omnimotion and sending data to the mainboard over serial connection. Also contains an example implementation (TurtleRobot) that visualizes motion using turtle tools in python.
+	* main.py - main logic file that contains the state machine for robot driving, basket states, referee server controlling and enables the controlling of the robot.
+
+The `main.py` holds the state machine for the driving logic. For configurations check the software branch readme file. The overall logic of the code is as follows:
+
 
 === Analysis
 ----
 A short analysis of what was good and bad in your code and how to improve.
 ----
+
 
 == Mechanics
 ----
@@ -48,6 +59,7 @@ Description of the main points of interest in your ball thrower design and const
 Photos of your robot.
 A short analysis of what was good and bad in your mechanics and how to improve.
 ----
+
 
 == Personal comments
 ----
@@ -59,6 +71,7 @@ What did you like/did not like about the course/building a robot?
 Suggestions for next year students.
 Suggestions for instructors.
 ----
+
 
 === Pille
 
@@ -73,6 +86,7 @@ The idea of the course is good. The realization of that idea not so good. As eve
 If I could suggest something to next year students then it is to pick your team mates wisely (if possible). You are stuck with them for the whole semester.
 
 If I could suggest something to the instructors it would to organize task presentations better. At the moment you come to class and wait, not knowing, if an instructor is going to be present nor if he/she has time for you. Maybe create a time-slot registration system?
+
 
 == DAILY BLOG
 
@@ -391,4 +405,4 @@ Kenno:: CAM done and mechanics issues on github fixed. (2h)
 
 === 08.01
 
-Pille:: Code issues resolved. Software documentation. Restructuring files (2h)
+Pille:: Code issues resolved. Software and main documentation. Restructuring files (3h)
