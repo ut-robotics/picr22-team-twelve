@@ -4,7 +4,7 @@
 
 * Pille Pärnalaas - Programming
 * Kenno Kallastu - Mechanics
-[line-through]#* Stepan Denysenko - Electronics#
+[line-through]#Stepan Denysenko - Electronics#
 
 
 === Public Fusion 360 project for mechanics
