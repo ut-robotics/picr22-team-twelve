@@ -1,0 +1,2 @@
+
+Before running the code run on command line "sudo dmesg | grep tty" to serial port permissions.
