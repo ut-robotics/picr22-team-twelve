@@ -324,3 +324,7 @@ Kenno::
 === 13.12
 
 Kenno:: CAM done and mechanics issues on github fixed. (2h)
+
+=== 08.01
+
+Pille:: Code issues resolved. Software documentation. Restructuring files (2h)
