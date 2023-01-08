@@ -10,6 +10,62 @@
 (Currently the test robot, will be updated to the actual robot when it's done)
 Link: https://a360.co/3haaYUI
 
+== Programming
+
+Libraries used::
+	* pyrealsense2 - to use the Real Sense camera and to process that info;
+	* numpy - for matrix and array processing but also other scientific computing;
+	* cv2 - for visualizing image data;
+	* enum - using enumeration classes to save time with state machines;
+	* _pickle - to read saved colors information from file and to serialize that information (saves time);
+	* time - to use duration timers in the code;
+	* asyncio - to run the referee client in the background while the robot operates normally;
+	* json - to proccess referee server commands;
+	* threading - to proccess the referee server and asyncio;
+	* websockets - to listen to the referee server over sockets;
+	* struct - to send data to the mainboard in needed syntax;
+	* math - to do some calculations;
+	* turtle - to simulate the robot movement virtually;
+	* tkinter - to draw the turtle simulation;
+	* serial - to connect to the mainboard via serial;
+	* serial.tools.list_ports - to check all the available serial ports.
+
+=== Description of game logic and code structure
+'A brief description of your game logic and overall code structure.'
+'A block diagram of your game logic.'
+
+=== Analysis
+'A short analysis of what was good and bad in your code and how to improve.'
+
+== Mechanics
+'If you used something different from what was given at the start of the course or did something different, describe it.'
+'Description of the main points of interest in your ball thrower design and construction process.'
+'Photos of your robot.'
+'A short analysis of what was good and bad in your mechanics and how to improve.'
+
+== Personal comments
+'Each member must write a paragraph that covers the following:'
+'On which parts of the robot did you work on?'
+'What did you learn?'
+'What would you do differently next time?'
+'What did you like/did not like about the course/building a robot?'
+'Suggestions for next year students.'
+'Suggestions for instructors.'
+
+=== Pille
+
+I worked on the programming part of the robot. Also did my best to do team management but the team did fall apart mid course.
+
+I learned a lot about omni-motion robot programming during the course and how to build a more complex state machine. Also learned to use a realsense camera with depth information and how to use and proccess that data. Got some practice on image processing and python code structuring.
+
+If I could do the course again I would try to get a better team. As I fell ill on the exact day of the bootcamp when teams were formed, I got left out and the "team" that was formed later was not good. As the work progressed I got a sense that for me it would have been a lot easier to do the mechanics part, as I have good experience with CAD modelling. Unfortunately when roles got divided, I was left with programming. I would have been more interested in designing and creating a new robot body.
+
+The idea of the course is good. The realization of that idea not so good. As everything eventually comes down to whether or not you have a good team, the course sucks to do when the team is bad. The course organization lacks communication by the instructors. There are almost no information sent via email or slack, if you happen to miss a day on-site in the beginning, you are always playing catch-up. The course wiki page is pretty good but still lacks information regarding progress presentation requirements and purpose.
+
+If I could suggest something to next year students then it is to pick your team mates wisely (if possible). You are stuck with them for the whole semester.
+
+If I could suggest something to the instructors it would to organize task presentations better. At the moment you come to class and wait, not knowing, if an instructor is going to be present nor if he/she has time for you. Maybe create a time-slot registration system?
+
 == DAILY BLOG
 
 === 03.09
