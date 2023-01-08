@@ -6,8 +6,6 @@ import time
 import tkinter as tk
 import serial
 import serial.tools.list_ports
-import math
-import time
 
 class IRobotMotion:
     def open(self):
