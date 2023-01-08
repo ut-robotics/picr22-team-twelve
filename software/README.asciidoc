@@ -1,6 +1,6 @@
 = This is the software documentation file for team TWELVE.
 
-The code is based on example code which is heavily inspired by: [Mitupead - football robot](https://github.com/lwd8cmd/Mitupead)
+The code is based on example code which is heavily inspired by: https://github.com/lwd8cmd/Mitupead[Mitupead - football robot]
 
 This is an implementation of a LUT based segmentation module that can be used with Realsense cameras.
 
@@ -30,7 +30,7 @@ A example file containing usecases for the aforementioned modules.
 === config_colors.py
 Utility to configure colors. Check log for detailed instructions.
 
-== How to use
+== How to set up
 
 Segmentation module installation:
 ----
@@ -56,4 +56,8 @@ sudo dmesg | grep tty
 ----
 
 If you encounter dependency errors, resolve them with pip3.9
+
+== How to run
+
+
 
