@@ -43,7 +43,9 @@ The code is broken down to 6 files::
 	* motion.py - Contains a IRobotMotion interface that descibes method required for moving the robot. Has the driving logic for omnimotion and sending data to the mainboard over serial connection. Also contains an example implementation (TurtleRobot) that visualizes motion using turtle tools in python.
 	* main.py - main logic file that contains the state machine for robot driving, basket states, referee server controlling and enables the controlling of the robot.
 
-The `main.py` holds the state machine for the driving logic. For configurations check the software branch readme file. The overall logic of the code is as shown on this https://drive.google.com/file/d/1yLGe8DUNGeWWGTZ_hRFPqS1l04g-p03I/view?usp=sharing[block diagram].
+The `main.py` holds the state machine for the driving logic. For configurations check the software branch readme file. The overall logic of the code is as shown on this block diagram 
+
+image:robootika.drawio.svg[block diagram]
 
 
 === Analysis
