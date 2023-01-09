@@ -92,12 +92,12 @@ If you plan to use the robot over wifi, first connect the robot nuc to the monit
 
 Check if the robot is connected to the same wifi as the controlling computer. Then you can disconnect the display. 
 
-Using Putty enter the name twelve as the client to connect to and enter the robot password `robot`.
+Using Putty you can connect to the robot remotely entering the hostname and password.
 
 Then switch on the motors, place the robot on the field and on the command line run
 ----
 python3.9 main.py
 ----
-If problems appear, check that you are in the right folder.
+If problems appear, check that you are in the right folder and read the output error message.
 
 
