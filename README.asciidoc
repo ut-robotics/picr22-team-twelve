@@ -56,19 +56,19 @@ I think the state machine could be in an another file as well as the referee ser
 
 I took alot of inspiration from previous years designs, as I figured that there's no reason to re-invent the wheel when there are "battle-tested" ideas available. Say for example with the chassis, I studied an older design then built my own design from scratch and sort of tried to make it better and efficient as previous years design.
 
-<br>
+
 
 The ball thrower was probably the trickiest of the parts, since when the thrower sucks, then it doesn't matter how good the code is as it will miss anyway. I probably overlooked the rigidity on my first few designs and it was clear that the accuracy would've suffered if I had't more spacers, deeper drilled holes etc. Also the area between the thrower motor and ground was pretty difficult to get right since you have to consider that the ball is soft and the bottom of the thrower can't slide against the ground. The easiest solution to that was to import an actual 3D model of the ball into the design and see how it passes through and where it gets stuck.
 
-<br>
+
 
 For the construction of the parts I'd probably recommend coming up with some assisting tools for drilling the holes, maybe a thin 3D-printed sheet where the holes should be drilled. It's better to be safe than sorry since drilling in the holes a few mm could easily ruin your manufactured part.
 
-<br>
 
 
 
-<br>
+
+
 
 === Analysis
 
