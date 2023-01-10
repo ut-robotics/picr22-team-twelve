@@ -94,7 +94,7 @@ If I could suggest something to the instructors it would to organize task presen
 
 I worked on the mechanics part of the robot, whenever possible also helped with electronics when it was still being done.
 
-I learned that it is not all that difficult to create something as I first thought. Since I had used other CAD programs before this course then I also learned a thing or two about Fusion 360 and compare it's capabilites to other CAD programs. Bunch of new commands like rigid groups and circular patterns. Got to know how to do CAD for the first time and learn how to use the milling machine.
+I learned that it is not all that difficult to create something as I first thought. Since I had used other CAD programs before this course then I also learned a thing or two about Fusion 360 and compare it's capabilites to other CAD programs. Bunch of new commands like rigid groups and circular patterns. Got to know how to do CAM for the first time and learn how to use the milling machine.
 
 I wouldn't honestly blame the team all that much, if we had electronics properly done we would've had no issues completing everything whatsoever. Speaking about myself I would probably be asking twice as more questions as I had, it would've saved many headaches. Also familiarize with the tasks, what needs to be done and how, I realized on the last week that the mechanics designs have to be all approved to get the points for each of the tasks.
 
