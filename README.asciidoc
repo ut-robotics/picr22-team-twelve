@@ -66,7 +66,7 @@ For the construction of the parts I'd probably recommend coming up with some ass
 
 
 
-image:robot_CAD.PNG[]
+image:robot_CAD2.PNG[]
 
 
 
