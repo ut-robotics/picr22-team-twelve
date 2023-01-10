@@ -8,8 +8,7 @@
 
 
 === Public Fusion 360 project for mechanics
-(Currently the test robot, will be updated to the actual robot when it's done)
-Link: https://a360.co/3haaYUI
+Link: https://a360.co/3VY7rb6
 
 
 == Programming
@@ -403,6 +402,10 @@ Kenno::
 === 13.12
 
 Kenno:: CAM done and mechanics issues on github fixed. (2h)
+
+=== 15.12
+
+Kenno:: Troubleshooting and fixing final design issues on-site. (2h)
 
 === 08.01
 
