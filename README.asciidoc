@@ -53,25 +53,28 @@ I think the state machine could be in an another file as well as the referee ser
 
 
 == Mechanics
-----
-If you used something different from what was given at the start of the course or did something different, describe it.
-Description of the main points of interest in your ball thrower design and construction process.
-Photos of your robot.
-A short analysis of what was good and bad in your mechanics and how to improve.
-----
 
+I took alot of inspiration from previous years designs, as I figured that there's no reason to re-invent the wheel when there are "battle-tested" ideas available. Say for example with the chassis, I studied an older design then built my own design from scratch and sort of tried to make it better and efficient as previous years design.
+
+<br>
+
+The ball thrower was probably the trickiest of the parts, since when the thrower sucks, then it doesn't matter how good the code is as it will miss anyway. I probably overlooked the rigidity on my first few designs and it was clear that the accuracy would've suffered if I had't more spacers, deeper drilled holes etc. Also the area between the thrower motor and ground was pretty difficult to get right since you have to consider that the ball is soft and the bottom of the thrower can't slide against the ground. The easiest solution to that was to import an actual 3D model of the ball into the design and see how it passes through and where it gets stuck.
+
+<br>
+
+For the construction of the parts I'd probably recommend coming up with some assisting tools for drilling the holes, maybe a thin 3D-printed sheet where the holes should be drilled. It's better to be safe than sorry since drilling in the holes a few mm could easily ruin your manufactured part.
+
+<br>
+
+
+
+<br>
+
+=== Analysis
+
+Looking back I definitely should've started working on this course sooner and also go on-site to troubleshoot the issues, as the response over Slack was slow sometimes and could've used more explanation. I also underestimated how long long the reviewal and actualy approval would take, even a small issue discovered meant that it was time to go back into Fusion and start fixing. Overall I think the designs I made were okay.
 
 == Personal comments
-----
-Each member must write a paragraph that covers the following:
-On which parts of the robot did you work on?
-What did you learn?
-What would you do differently next time?
-What did you like/did not like about the course/building a robot?
-Suggestions for next year students.
-Suggestions for instructors.
-----
-
 
 === Pille
 
@@ -86,6 +89,9 @@ The idea of the course is good. The realization of that idea not so good. As eve
 If I could suggest something to next year students then it is to pick your team mates wisely (if possible). You are stuck with them for the whole semester.
 
 If I could suggest something to the instructors it would to organize task presentations better. At the moment you come to class and wait, not knowing, if an instructor is going to be present nor if he/she has time for you. Maybe create a time-slot registration system?
+
+=== Kenno
+
 
 
 == DAILY BLOG
