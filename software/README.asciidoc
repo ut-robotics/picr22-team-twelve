@@ -86,7 +86,7 @@ If you want to test the thrower and not play robot basketball yet comment in lin
 
 === Running
 
-When using batteries, always check the  chargelevel of the battery. Information found https://ut-robotics.github.io/picr22-home/basketball_robot_guide/general/batteries.html?fbclid=IwAR1gUMz-IDl2nLR9_VfQ_3ubaFO5fuCyc9eYdoiWjIQNT7CG1ellCiDWb4M[here]
+When using batteries, always check the  chargelevel of the battery. Information found https://ut-robotics.github.io/picr22-home/basketball_robot_guide/general/batteries.html[here]
 
 If you plan to use the robot over wifi, first connect the robot nuc to the monitor. Navigate to the git folder of the code and always run +git pull+ to make sure the latest version of code is running.
 
