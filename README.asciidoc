@@ -4,8 +4,105 @@
 
 * Pille Pärnalaas - Programming
 * Kenno Kallastu - Mechanics
-* Stepan Denysenko - Electronics
+* __Stepan Denysenko - Electronics__ (disappeared)
 
+
+=== Public Fusion 360 project for mechanics
+Link: https://a360.co/3VY7rb6
+
+
+== Programming
+
+Libraries used::
+	* pyrealsense2 - to use the Real Sense camera and to process that info;
+	* numpy - for matrix and array processing but also other scientific computing;
+	* cv2 - for visualizing image data;
+	* enum - using enumeration classes to save time with state machines;
+	* _pickle - to read saved colors information from file and to serialize that information (saves time);
+	* time - to use duration timers in the code;
+	* asyncio - to run the referee client in the background while the robot operates normally;
+	* json - to proccess referee server commands;
+	* threading - to proccess the referee server and asyncio;
+	* websockets - to listen to the referee server over sockets;
+	* struct - to send data to the mainboard in needed syntax;
+	* math - to do some calculations;
+	* turtle - to simulate the robot movement virtually;
+	* tkinter - to draw the turtle simulation;
+	* serial - to connect to the mainboard via serial;
+	* serial.tools.list_ports - to check all the available serial ports.
+
+
+=== Description of game logic and code structure
+
+The code is broken down to 6 files::
+	* config_colors.py - Utility to configure colors. Check log for detailed instructions.
+	* color.py - contains color information and its enum class.
+	* camera.py - contains the camera proccessing code and describes methods required by the image processing module (for different camera types).
+	* image processor.py - main file for image processing, provides processed frame data. Object analysing and filtration.
+	* motion.py - Contains a IRobotMotion interface that descibes method required for moving the robot. Has the driving logic for omnimotion and sending data to the mainboard over serial connection. Also contains an example implementation (TurtleRobot) that visualizes motion using turtle tools in python.
+	* main.py - main logic file that contains the state machine for robot driving, basket states, referee server controlling and enables the controlling of the robot.
+
+The `main.py` holds the state machine for the driving logic. For configurations check the software branch readme file. The overall logic of the code is as shown on this block diagram 
+
+image:robootika.drawio.svg[block diagram]
+
+
+=== Analysis
+
+I think the state machine could be in an another file as well as the referee server, it would make the code easier to read. Also the calculations made in the states could be written better. As a pluss I would say, it is a rather simple implementation broken down to understandable piecies of driving logic.
+
+
+== Mechanics
+
+I took alot of inspiration from previous years designs, as I figured that there's no reason to re-invent the wheel when there are "battle-tested" ideas available. Say for example with the chassis, I studied an older design then built my own design from scratch and sort of tried to make it better and efficient as previous years design.
+
+
+
+The ball thrower was probably the trickiest of the parts, since when the thrower sucks, then it doesn't matter how good the code is as it will miss anyway. I probably overlooked the rigidity on my first few designs and it was clear that the accuracy would've suffered if I had't more spacers, deeper drilled holes etc. Also the area between the thrower motor and ground was pretty difficult to get right since you have to consider that the ball is soft and the bottom of the thrower can't slide against the ground. The easiest solution to that was to import an actual 3D model of the ball into the design and see how it passes through and where it gets stuck.
+
+
+
+For the construction of the parts I'd probably recommend coming up with some assisting tools for drilling the holes, maybe a thin 3D-printed sheet where the holes should be drilled. It's better to be safe than sorry since drilling in the holes a few mm could easily ruin your manufactured part.
+
+
+
+image:robot_CAD2.PNG[]
+
+
+
+=== Analysis
+
+Looking back I definitely should've started working on this course sooner and also go on-site to troubleshoot the issues, as the response over Slack was slow sometimes and could've used more explanation. I also underestimated how long long the reviewal and actualy approval would take, even a small issue discovered meant that it was time to go back into Fusion and start fixing. Overall I think the designs I made were okay.
+
+== Personal comments
+
+=== Pille
+
+I worked on the programming part of the robot. Also did my best to do team management but the team did fall apart mid course.
+
+I learned a lot about omni-motion robot programming during the course and how to build a more complex state machine. Also learned to use a realsense camera with depth information and how to use and proccess that data. Got some practice on image processing and python code structuring.
+
+If I could do the course again I would try to get a better team. As I fell ill on the exact day of the bootcamp when teams were formed, I got left out and the "team" that was formed later was not good. As the work progressed I got a sense that for me it would have been a lot easier to do the mechanics part, as I have good experience with CAD modelling. Unfortunately when roles got divided, I was left with programming. I would have been more interested in designing and creating a new robot body.
+
+The idea of the course is good. The realization of that idea not so good. As everything eventually comes down to whether or not you have a good team, the course sucks to do when the team is bad. The course organization lacks communication by the instructors. There are almost no information sent via email or slack, if you happen to miss a day on-site in the beginning, you are always playing catch-up. The course wiki page is pretty good but still lacks information regarding progress presentation requirements and purpose.
+
+If I could suggest something to next year students then it is to pick your team mates wisely (if possible). You are stuck with them for the whole semester.
+
+If I could suggest something to the instructors it would to organize task presentations better. At the moment you come to class and wait, not knowing, if an instructor is going to be present nor if he/she has time for you. Maybe create a time-slot registration system?
+
+=== Kenno
+
+I worked on the mechanics part of the robot, whenever possible also helped with electronics when it was still being done.
+
+I learned that it is not all that difficult to create something as I first thought. Since I had used other CAD programs before this course then I also learned a thing or two about Fusion 360 and compare it's capabilites to other CAD programs. Bunch of new commands like rigid groups and circular patterns. Got to know how to do CAM for the first time and learn how to use the milling machine.
+
+I wouldn't honestly blame the team all that much, if we had electronics properly done we would've had no issues completing everything whatsoever. Speaking about myself I would probably be asking twice as more questions as I had, it would've saved many headaches. Also familiarize with the tasks, what needs to be done and how, I realized on the last week that the mechanics designs have to be all approved to get the points for each of the tasks.
+
+It was fun to do hands on work at school not just study theory. I did not like the approval part of the designs as it was pretty long and there was always something that came up which meant you had to re-submit and wait for more. This long approval process and change of mind from the instructors probably was one of the reason why I didn't make it to milling it all out. I'm still also pretty mad about the fact that I lost half the points for a design that was literally done a month before a deadline, the design was all functional and ready but the instructor wanted a cable, I had already provided images and explanations about how it works out and how it worked on the test-part but still even after I modelled the cable and after the deadline had passed because of the approval times it still got rejected.
+
+For next year students I'd recommend making a team of at least 4, you won't get more help for the fact that your team is smaller, also make sure you understand all the conditions of the course and make sure you start as soon as possible so you can smoothly complete the course and plan your time.
+
+I think this course needs more instructors, there were only 2 who would do everything and the wait times after them on-site were long. There should be at least one instrucor for each of the fields.
 
 == DAILY BLOG
 
@@ -93,6 +190,8 @@ Pille::
 
 Kenno:: Finished the first thrower design, slides for presentation. (1h)
 
+Pille:: Presenting progress and resolving team issues. (2h)
+
 === 05.10
 
 Pille:: 
@@ -108,5 +207,222 @@ Kenno::
 
 Pille:: Programming robot moving logic. (2h)
 
+=== 10.10
+
+Kenno:: 
+	* New test robot thrower as the first design had issues. (2h30min)
+	* Messing with the joining, gave the thrower for first review, needs dogbones to be ready (1h)
+
+Pille::
+	* Started re-soldering the test robots battery to NUC connections as one of the plugs was wrong. Stepan took over. (30min)
+	* Trying to get remote access to the robot computer set up. Still doesn't work correctly. (1h15min)
+	* The test robot is finally assembled, I could test the code in action. Robot drives straight and is able to follow the ball. (45min)
+
+=== 12.10
+
+Pille:: Editing the code as requested by the instructor. (1h)
+
+=== 13.10
+
+Pille:: Screwing in final bolts to the test-robot frame. (20min)
+
+=== 16.10
+
+Pille:: Progress presentation slides for monday. (20min)
+
+=== 17.10
+
+Kenno:: On-site presentation and valuable info for the team. (1h15min)
+
+=== 18.10
+
+Kenno:: Fixed the thrower issues that were pointed out after the review. (2h)
+
+=== 19.10
+
+Kenno:: Fixed the new issues of the thrower. (1h)
+
+=== 20.10
+
+Pille:: Programming the ball following logic, presenting to the instructor. Calibrating color configuration. (2.5h)
+
+=== 26.10
+
+Kenno:: First CAM for the test robot thrower done. (2h)
+
+=== 27.10
+
+Kenno:: CAM final adjustments and milling out the parts. (2h)
+Pille:: Onsite code testing. Color configurations, trying to setup remote acces with camera view. Failed. (1h)
+
+=== 29.10
+
+Pille:: 
+	* Slides for mondays presentation. Uploading video. (20min)
+	* Starting the programming on robot finding basket. How to orbit? (45min)
+
+=== 30.10
+
+Stepan:: Started working on PCB schematics. (10h)
+
+=== 31.10
+
+Pille:: Presentation on site. (1h)
+
+=== 01.11
+
+Kenno:: Attached the thrower to the test robot. (3h)
+Pille:: Modification of the code after feedback from instructor. (30min)
+
+=== 03.11
+
+Pille:: 
+	* Programming the ball throwing logic. Still have questions. (1h)
+	* Programming - adding referee command listening (30min)
+	* Programming on site - trying to get camera image when remote connection, failed, still have qt5 error. (1h30min)
+	* Programming on site - testing the code, rewriting logic to find basket and orbit the ball. It is now proportional. (2h)
+	* Commenting the code. (30min)
+
+=== 04.11
+
+Stepan:: Rewired the thrower (1h)
+
+=== 05.11
+
+Pille:: Changes to the ball throwing logic code (30min).
+
+=== 07.11
+
+Pille:: On-site testing of the code. Works more or less, precision is not good. Couldn't test the thrower because it didn't work. (1h20min)
+
+=== 09.11
+
+Pille:: 
+	* Team management, following up with team mates, checking on progress. Discussion whether I try to get the programming ready for tomorrows test competition or not. (30min)
+	* On-site testing the movement and thrower. (2h)
+	
+=== 13.11
+
+Pille:: Progress presentation slides (30min).
+
+=== 14.11
+
+Pille:: 
+	* Testing the throwing logic. Even managed to get some balls in the basket. (1h)
+	* Presentation (1h).
+	
+=== 16.11
+
+Kenno:: 
+	* Wheel design. (2h)	
+	* Motor mount design. (30min)
+	* Fixing issues that were pointed out during the review. (30min)
+
+=== 17.11
+
+Pille:: 
+	* Editing the code, making changes requested in the code review. (1h45min)
+	* On-site: fixing the wheel, then fixing the thrower connection. (1h)
+	* On-site: adjusting code to throw the ball more precisely. (1h30min)
+	* Adding basket depth calculations. (30min)
+
+Kenno:: 
+	* Robot issues, design help and fixes. (1h30min)
+	* Brainstorming ideas for the camera mount. (30min)
+
+=== 18.11
+
+Kenno:: Camera mount is halfway done. (1h)
+Pille:: Calibrating throwing. (1h15min)
+
+=== 21.11
+
+Kenno:: 
+	* Fixing designs. (30min)
+	* Camera mount done. (2h)
+Pille::
+	* Fixing the ball throwing issues. Tried to get the thrower motor speed proportional to distance. Changed the basket distance calculations. (2h)
+	* Trying to get the referee command reactions working. Wasn't able to test properly, couldn't get the server running. (30min)
+	
+=== 23.11
+
+Kenno:: 
+	* Real thrower designed. (45min)
+
+=== 26.11
+
+Pille:: Progress presentation slides. (15min)
+
+=== 28.11
+
+Pille:: Adding logic to code. Drive straight to furthest basket when no ball is found for 15s during the find ball state. (1h)
+
+=== 29.11
+
+Kenno:: 
+	* Fixing the design issues. (30min)
+	* Chassis bottom plate done. (1h)
+
+=== 30.11
+
+Pille:: 
+	* Finished driving straight to the opposing basket logic. (45min)
+	* On-site testing the drive to opposite basket logic, some problems. (2h)
+	* Added an extra state to the code for finding the furthest basket. Edited the referee server connection code. (1h15min)
+
+=== 01.12
+
+Kenno:: Chassis design and other design issues. (2h)
+Pille:: 
+	* Changing the code based on feedback. (1h).
+	* On-site testing and presenting. (1h30min)
+
+=== 02.12
+
+Kenno:: 
+	* Github mechanics issues fixed. (30min)
+	* Some of the major cutouts of top plate are done, fixed issues with bottom plate, gave up because the post/pillar cutouts are horrible to deal with and get 		right. (2h)
+	
+=== 05.12
+
+Kenno:: 
+	* Finally the chassis bottom plate issues seem to be fixed. (30min)
+	* The chassis design should be done. (3h)
+
+=== 07.12
+
+Pille:: Rewriting reacting to referee commands, should work now. (30min)
+
+=== 08.12
+
+Kenno:: 3D printing the wheel parts. (30min)
+
+=== 09.12
+
+Kenno:: Fixing chassis issues. (3h)
+
+=== 11.12
+
+Pille: Presentation slides, reviewing team progress and planning (30min).
+
+=== 12.12
+
+Kenno:: 
+	* Slides. (10min)	
+	* Still fixing the chassis issues. (2h)
+	* Presentation and measuring on site. (45min)
+	* Fixed chassis electronics models. (30min)
+	* Started with CAM. (30min)
 
 
+=== 13.12
+
+Kenno:: CAM done and mechanics issues on github fixed. (2h)
+
+=== 15.12
+
+Kenno:: Troubleshooting and fixing final design issues on-site. (2h)
+
+=== 08.01
+
+Pille:: Code issues resolved. Software and main documentation. Restructuring files (3h)
