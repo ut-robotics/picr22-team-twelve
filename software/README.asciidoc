@@ -73,7 +73,7 @@ If you are not using the referee server then the basket color to which to throw 
     basket_color = BasketColor.MAGENTA
 ----
 
-If you are using the referee server, set the referee variable to true (line 114) and set your team name (line 116).
+If you are using the referee server, set the referee variable to true (line 114), set the IP of the referee server (line 32) and set your team name (line 116).
 ----
     referee_active = True #true if referee server active, false if not
     robot_id="twelve" # the name of your robot used by the referee server
