@@ -1,2 +1,104 @@
+= This is the software documentation file for team TWELVE.
+
+The code is based on example code which is heavily inspired by: https://github.com/lwd8cmd/Mitupead[Mitupead - football robot]
+
+This is an implementation of a LUT based segmentation module that can be used with Realsense cameras.
+
+Designed to use Python 3. Dependencies: numpy, openCV, pyrealsense2
+
+== Modules in the code
+
+===  Color.py
+Contains data of the colors that are detected. Also contains data used to display the colors in the debug view.
+
+=== camera.py
+Contains a ICamera interface that describes methods required by the image processing module. Also contains an example implementation for Intel RealSense cameras (RealsenseCamera) and OpenCV web cameras (OpenCVCamera).
+
+=== image_processor.py 
+Main module for image processing. Is responsible for image color and feature segmentation. Object analysis and filtration happens in this module.
+----
+def process_frame(self, aligned_depth = False) -> ProcessedResults: 
+----
+Is the main method responsible for providing processed frame data.
+
+=== motion.py
+Contains a IRobotMotion interface that descibes method required for moving the robot. 
+Has the driving logic for omnimotion and sending data to the mainboard over serial connection.
+Also contains an example implementation (TurtleRobot) that visualizes motion using turtle tools in python.
+
+=== main.py
+Main logic file that contains the state machine for robot driving, basket states, referee server controlling and enables the controlling of the robot.
+
+=== config_colors.py
+Utility to configure colors. Check log for detailed instructions.
+
+== How to set up
+
+Segmentation module installation:
+----
+cd segment_module
+pip3.9 install .
+----
+
+Running color configurator:
+----
+mkdir colors
+touch colors/colors.pkl
+python3.9 config_colors.py
+----
+
+Configuring serial port permissions:
+----
 sudo dmesg | grep tty
+----
+
+If you encounter dependency errors, resolve them with pip3.9
+
+== How to run the code
+
+=== Configurations
+
+Before using there are some variables you can change in the `main.py` depending what features are you using.
+To enable or disable camera image display in line 90:
+----
+    debug = True # to show camera image
+    debug = False # not to show camera image
+----
+
+If you are not using the referee server then the basket color to which to throw is set in line 92:
+----
+    # to set basket color blue
+    basket_color = BasketColor.BLUE
+    # to set basket color magenta
+    basket_color = BasketColor.MAGENTA
+----
+
+If you are using the referee server, set the referee variable to true (line 114), set the IP of the referee server (line 32) and set your team name (line 116). Port 8222 should work but if it doesn't check your ports.
+----
+    referee_active = True #true if referee server active, false if not
+    ip_addr='192.168.3.28:8222'
+    robot_id="twelve" # the name of your robot used by the referee server
+----
+
+If you want to test the thrower and not play robot basketball yet comment in line 140.
+----
+    state = State.TEST_THROWER
+----
+
+=== Running
+
+When using batteries, always check the  chargelevel of the battery. Information found https://ut-robotics.github.io/picr22-home/basketball_robot_guide/general/batteries.html[here]
+
+If you plan to use the robot over wifi, first connect the robot nuc to the monitor. Navigate to the git folder of the code and always run +git pull+ to make sure the latest version of code is running.
+
+Check if the robot is connected to the same wifi as the controlling computer. Then you can disconnect the display. 
+
+Using Putty you can connect to the robot remotely entering the hostname and password.
+
+Then switch on the motors, place the robot on the field and on the command line run
+----
+python3.9 main.py
+----
+If problems appear, check that you are in the right folder and read the output error message.
+
 
